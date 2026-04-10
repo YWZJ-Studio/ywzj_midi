@@ -96,6 +96,11 @@ public class Channel {
                 ServerPlayMidiHandler::onServerMessageReceived,
                 Optional.of(PLAY_TO_SERVER));
 
+        CHANNEL.registerMessage(PacketId.S_SLICED_PACKET.value(), ServerSlicedPacket.class,
+                ServerSlicedPacket::encode, ServerSlicedPacket::decode,
+                ServerSlicedPacket::handle,
+                Optional.of(PLAY_TO_CLIENT));
+
     }
 
 }
@@ -115,7 +120,8 @@ enum PacketId {
     S_POSE_DATA(109),
     C_FAKE_PLAYER_DATA(110),
     C_FILE_DATA(111),
-    C_PLAY_MIDI(112);
+    C_PLAY_MIDI(112),
+    S_SLICED_PACKET(113);
 
     private final int id;
 

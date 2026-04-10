@@ -1,0 +1,17 @@
+{
+  "type": "generic",
+  "name": "piano",
+  "loop": false,
+  "portable": false,
+  "key_start": "a1",
+  "key_end": "c8",
+  "variants": [
+    {
+      "name": "raw",
+      "loop": false,
+      "key_start": "a1",
+      "key_end": "c8"
+    }
+  ],
+  "structure_model": "ywzj_midi:models/bedrock/instrument/piano"
+}

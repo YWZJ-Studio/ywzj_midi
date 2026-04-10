@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.entity.FakePlayerEntity;
+import org.ywzj.midi.entity.InstrumentEntity;
 import org.ywzj.midi.entity.SeatEntity;
 
 public class AllEntities {
@@ -24,6 +25,13 @@ public class AllEntities {
             new SeatEntity(world), MobCategory.MISC)
             .sized(0.0F, 0.0F)
             .setCustomClientFactory((spawnEntity, world) -> new SeatEntity(world)));
+
+    public static final RegistryObject<EntityType<InstrumentEntity>> GENERIC_INSTRUMENT = registerEntities(
+            "generic_instrument",
+            EntityType.Builder.<InstrumentEntity>of(InstrumentEntity::new, MobCategory.MISC)
+                    .sized(1.0F, 1.0F)
+                    .clientTrackingRange(10)
+                    .setCustomClientFactory((spawnEntity, world) -> new InstrumentEntity(world, null)));
 
     private static <T extends Entity> RegistryObject<EntityType<T>> registerEntities(String name, EntityType.Builder<T> builder)
     {

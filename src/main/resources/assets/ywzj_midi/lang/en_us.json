@@ -1,35 +1,6 @@
 {
   "tab.ywzj_midi": "Limitless Concert",
 
-  "block.ywzj_midi.aa775": "AA775",
-  "block.ywzj_midi.u1h": "YAMAHA U1H",
-  "block.ywzj_midi.cfx": "YAMAHA CFX",
-  "block.ywzj_midi.timpani": "Timpani",
-  "block.ywzj_midi.bass_drum": "Bass Drum",
-  "block.ywzj_midi.piano_bench_block": "Piano Bench",
-  "block.ywzj_midi.speaker_block": "Speaker",
-  "block.ywzj_midi.music_stand_block": "Music Stand",
-  "item.ywzj_midi.music_player_item": "Music Player",
-  "item.ywzj_midi.baton_item": "Baton",
-  "item.ywzj_midi.violin": "Violin",
-  "item.ywzj_midi.violin_bow_item": "Violin Bow",
-  "item.ywzj_midi.viola": "Viola",
-  "item.ywzj_midi.viola_bow_item": "Viola Bow",
-  "item.ywzj_midi.cello": "Cello",
-  "item.ywzj_midi.cello_bow_item": "Cello Bow",
-  "item.ywzj_midi.double_bass": "Double Bass",
-  "item.ywzj_midi.double_bass_bow_item": "Double Bass Bow",
-  "item.ywzj_midi.oboe": "Oboe",
-  "item.ywzj_midi.clarinet": "Clarinet",
-  "item.ywzj_midi.flute": "Flute",
-  "item.ywzj_midi.bassoon": "Bassoon",
-  "item.ywzj_midi.horn": "Horn",
-  "item.ywzj_midi.trumpet": "Trumpet",
-  "item.ywzj_midi.trombone": "Trombone",
-  "item.ywzj_midi.tuba": "Tuba",
-  "item.ywzj_midi.cymbal": "Cymbal",
-  "item.ywzj_midi.felt_mallet_item": "Felt Mallet",
-
   "ui.ywzj_midi.open_midi_device": "Open Midi Device",
   "ui.ywzj_midi.open_mid_file": "Open Mid File",
   "ui.ywzj_midi.midi_connected": "Midi Connected",
@@ -78,5 +49,4 @@
   "info.ywzj_midi.suggestion_conduct_on_server": "Conduct on server",
 
   "tip.ywzj_midi.baton": "§7§oRight click to open the baton GUI.\nSneak right click to spawn a musician dummy.\nName Tag and Book can be used to interact with the dummy"
-
 }
