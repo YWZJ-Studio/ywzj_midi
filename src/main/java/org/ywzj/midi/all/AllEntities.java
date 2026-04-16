@@ -14,7 +14,7 @@ import org.ywzj.midi.entity.SeatEntity;
 
 public class AllEntities {
 
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, YwzjMidi.MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, YwzjMidi.MOD_ID);
 
     public static final RegistryObject<EntityType<FakePlayerEntity>> FAKE_PLAYER = ENTITIES.register("fake_player",
             () -> EntityType.Builder.of(FakePlayerEntity::new, MobCategory.CREATURE).sized(0.8f, 1.9f)

@@ -2,10 +2,8 @@ package org.ywzj.midi.resource;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import cpw.mods.jarhandling.SecureJar;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
@@ -36,7 +34,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -111,35 +113,14 @@ public enum InstrumentPackLoader implements RepositorySource {
         List<Pack> packs = new ArrayList<>();
         List<PathPackResources> extensionPacks = new ArrayList<>();
         for (InstrumentPack instrumentPack : instrumentPacks) {
-            PathPackResources packResources = new PathPackResources(instrumentPack.meta.getNamespace(), false, instrumentPack.path) {
-
-                private final SecureJar secureJar = SecureJar.from(instrumentPack.path);
-
-                @NotNull
-                protected Path resolve(String... paths) {
-                    if (paths.length < 1) {
-                        throw new IllegalArgumentException("Missing path");
-                    } else {
-                        return this.secureJar.getPath(String.join("/", paths));
-                    }
-                }
-
-                public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
-                    return super.getResource(type, location);
-                }
-
-                public void listResources(PackType type, String namespace, String path, ResourceOutput resourceOutput) {
-                    super.listResources(type, namespace, path, resourceOutput);
-                }
-
-            };
+            PathPackResources packResources = new InstrumentPackResources(instrumentPack);
             extensionPacks.add(packResources);
-            Pack pack = Pack.readMetaAndCreate("ywzj_midi_resources_" + instrumentPack.meta.getNamespace(),
-                    Component.translatable(instrumentPack.meta.getTitle()),
+            Pack pack = Pack.readMetaAndCreate("ywzj_midi_resources_" + instrumentPack.meta().getNamespace(),
+                    Component.translatable(instrumentPack.meta().getTitle()),
                     true,
                     (id) -> new DelegatingPackResources(id,
                             false,
-                            new PackMetadataSection(Component.translatable(instrumentPack.meta.getDescription()), SharedConstants.getCurrentVersion().getPackVersion(packType)), extensionPacks) {
+                            new PackMetadataSection(Component.translatable(instrumentPack.meta().getDescription()), SharedConstants.getCurrentVersion().getPackVersion(packType)), extensionPacks) {
                                 public IoSupplier<InputStream> getRootResource(String... paths) {
                                     if (paths.length == 1 && paths[0].equals("pack.png")) {
                                         return packResources.getRootResource("pack.png");
@@ -231,11 +212,11 @@ public enum InstrumentPackLoader implements RepositorySource {
                 }
                 if (instrumentPack != null) {
                     if (namespaces.contains(instrumentPack.meta().getNamespace())) {
-                        YwzjMidi.LOGGER.error(MARKER, "- {}, Duplicated namespace: {}", instrumentPack.path.getFileName(), instrumentPack.meta.getNamespace());
+                        YwzjMidi.LOGGER.error(MARKER, "- {}, Duplicated namespace: {}", instrumentPack.path().getFileName(), instrumentPack.meta().getNamespace());
                         continue;
                     }
                     namespaces.add(instrumentPack.meta().getNamespace());
-                    YwzjMidi.LOGGER.info(MARKER, "- {}, Main namespace: {}", instrumentPack.path.getFileName(), instrumentPack.meta.getNamespace());
+                    YwzjMidi.LOGGER.info(MARKER, "- {}, Main namespace: {}", instrumentPack.path().getFileName(), instrumentPack.meta().getNamespace());
                     instrumentPacks.add(instrumentPack);
                 }
             }

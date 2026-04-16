@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 public class AllTabs {
 
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, YwzjMidi.MODID);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, YwzjMidi.MOD_ID);
 
     public static final List<Supplier<? extends ItemLike>> TAB_ITEMS = new ArrayList<>();
 

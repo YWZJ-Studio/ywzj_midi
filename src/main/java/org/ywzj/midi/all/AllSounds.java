@@ -31,7 +31,7 @@ public class AllSounds {
     }
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
-        return SOUNDS.computeIfAbsent(YwzjMidi.MODID, k -> DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, YwzjMidi.MODID)).register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(YwzjMidi.MODID, name)));
+        return SOUNDS.computeIfAbsent(YwzjMidi.MOD_ID, k -> DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, YwzjMidi.MOD_ID)).register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(YwzjMidi.MOD_ID, name)));
     }
 
     private static void registerKeysSoundEvent(String namespace, String instrumentName, int note, String variant) {

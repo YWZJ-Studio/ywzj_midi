@@ -77,7 +77,7 @@ public class FakePlayerSkin {
             e.printStackTrace();
         }
         if (image == null) {
-            return new ResourceLocation(YwzjMidi.MODID,"err");
+            return new ResourceLocation(YwzjMidi.MOD_ID,"err");
         }
         return registerImage(image, name);
     }

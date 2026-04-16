@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class AllEvents {
 
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class AllForgeEvents {
 
         @SubscribeEvent
@@ -49,7 +49,7 @@ public class AllEvents {
 
     }
 
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class AllModEvents {
 
         @SubscribeEvent
@@ -65,7 +65,7 @@ public class AllEvents {
     }
 
     @OnlyIn(Dist.CLIENT)
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class AllClientModEvents {
 
         @SubscribeEvent

@@ -1,5 +1,6 @@
 package org.ywzj.midi.client.resource;
 
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockAnimationFile;
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockModelPOJO;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
@@ -46,7 +47,12 @@ public class InstrumentDisplayManager extends SimplePreparableReloadListener<Map
                 if (pojo.model != null) {
                     modelPojo = ClientAssetsManager.INSTANCE.getModelPojo(pojo.model).orElse(null);
                 }
-                var display = new BaseInstrumentDisplay(displayId, modelPojo, pojo.texture, pojo.slotTexture);
+                BedrockAnimationFile animationFile = null;
+                if (pojo.animations != null) {
+                    animationFile = ClientAssetsManager.INSTANCE.getAnimation(pojo.animations).orElse(null);
+                }
+                var display = new BaseInstrumentDisplay(displayId, modelPojo, animationFile,
+                        pojo.texture, pojo.slotTexture, pojo.switchableAnimations);
                 builder.put(displayId, display);
             } catch (Exception e) {
                 YwzjMidi.LOGGER.error("Failed to load instrument display: {}", displayId, e);

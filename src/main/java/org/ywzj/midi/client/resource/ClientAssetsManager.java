@@ -1,5 +1,6 @@
 package org.ywzj.midi.client.resource;
 
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockAnimationFile;
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockModelPOJO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
@@ -24,16 +25,18 @@ public enum ClientAssetsManager {
     INSTANCE;
 
     private JsonDataManager<BedrockModelPOJO> models;
+    private JsonDataManager<BedrockAnimationFile> animations;
     private InstrumentDisplayManager instrumentDisplayManager;
 
     public void registerListeners(Consumer<PreparableReloadListener> consumer) {
         models = new JsonDataManager<>(BedrockModelPOJO.class, GsonUtil.GSON, "models/bedrock", "BedrockModelPojo");
+        animations = new JsonDataManager<>(BedrockAnimationFile.class, GsonUtil.GSON, "animations/bedrock", "BedrockAnimationPojo");
         instrumentDisplayManager = new InstrumentDisplayManager();
 
         consumer.accept(models);
+        consumer.accept(animations);
         consumer.accept(instrumentDisplayManager);
 
-        // Clear raw model data after display manager has consumed it
         consumer.accept(new SimplePreparableReloadListener<Void>() {
             @Override
             @ParametersAreNonnullByDefault
@@ -45,6 +48,7 @@ public enum ClientAssetsManager {
             @ParametersAreNonnullByDefault
             protected void apply(Void pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
                 models.clearData();
+                animations.clearData();
             }
         });
     }
@@ -52,9 +56,9 @@ public enum ClientAssetsManager {
     @OnlyIn(Dist.CLIENT)
     public void reload(ResourceManager resourceManager) {
         models.apply(models.prepare(resourceManager, null), null, null);
+        animations.apply(animations.prepare(resourceManager, null), null, null);
         instrumentDisplayManager.apply(instrumentDisplayManager.prepare(resourceManager, null), null, null);
 
-        // Pre-register textures with the texture manager
         instrumentDisplayManager.getDisplayMap().values().forEach(display -> {
             try {
                 if (display.getTexture() != null) {
@@ -75,6 +79,14 @@ public enum ClientAssetsManager {
             return Optional.empty();
         }
         return Optional.ofNullable(models.getAllData().get(id));
+    }
+
+    @Nullable
+    public Optional<BedrockAnimationFile> getAnimation(ResourceLocation id) {
+        if (animations == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(animations.getAllData().get(id));
     }
 
     @NotNull

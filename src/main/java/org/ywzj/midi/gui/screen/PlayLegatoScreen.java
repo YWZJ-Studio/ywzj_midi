@@ -9,6 +9,7 @@ import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.util.ComponentUtils;
 
 import java.util.Locale;
+import java.util.Map;
 
 public abstract class PlayLegatoScreen extends PlayKeyScreen {
 
@@ -26,12 +27,16 @@ public abstract class PlayLegatoScreen extends PlayKeyScreen {
     protected void init() {
         super.init();
         keyButtons.clear();
+        Map<String, net.minecraft.sounds.SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName());
+        if (sounds == null) {
+            return;
+        }
         int keyStartPos = width/2 - 170;
         int white = height/2 - 80;
         int black = height/2 - 100;
         int count = 0;
         boolean startFlag = false;
-        for (String soundName : AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName()).keySet()) {
+        for (String soundName : sounds.keySet()) {
             final String notation = soundName.replace(instrument.getName() + "_", "");
             if (notation.equals(keyStart)) {
                 startFlag = true;

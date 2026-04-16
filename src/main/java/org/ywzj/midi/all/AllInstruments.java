@@ -46,7 +46,7 @@ public class AllInstruments {
     public static void preRegister() {}
 
     public static Instrument registerInstrument(Supplier<Instrument> instrumentSupplier, Supplier<ItemLike> registrySupplier, Type type) {
-        return registerInstrument(YwzjMidi.MODID, instrumentSupplier, registrySupplier, type);
+        return registerInstrument(YwzjMidi.MOD_ID, instrumentSupplier, registrySupplier, type);
     }
 
     public static Instrument registerInstrument(String namespace, Supplier<Instrument> instrumentSupplier, Supplier<ItemLike> registrySupplier, Type type) {

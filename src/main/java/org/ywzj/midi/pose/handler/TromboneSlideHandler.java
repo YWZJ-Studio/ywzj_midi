@@ -50,7 +50,7 @@ public class TromboneSlideHandler extends NotesHandler {
     @SubscribeEvent
     public static void propertyOverrideRegistry(FMLClientSetupEvent event) {
         event.enqueueWork(() -> ItemProperties.register(AllItems.ITEMS_LOOKUP.get("trombone").get(),
-                new ResourceLocation(YwzjMidi.MODID, "note"),
+                new ResourceLocation(YwzjMidi.MOD_ID, "note"),
                 (itemStack, clientWorld, player, tag) -> {
                     if (player != null) {
                         SLIDES.computeIfAbsent(player.getUUID(), k -> new ConcurrentLinkedQueue<>());

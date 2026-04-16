@@ -12,7 +12,7 @@ import org.ywzj.midi.blockentity.SpeakerBlockEntity;
 public class AllBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, YwzjMidi.MODID);
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, YwzjMidi.MOD_ID);
 
     public static final RegistryObject<BlockEntityType<NoteBlockEntity>> NOTE_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("note_block_entity", () ->

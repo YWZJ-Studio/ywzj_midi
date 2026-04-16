@@ -18,6 +18,7 @@ import org.ywzj.midi.network.message.CPlayNote;
 import org.ywzj.midi.util.MidiUtils;
 import org.ywzj.midi.util.ParticleUtils;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -84,9 +85,14 @@ public class NotePlayer {
                 loop = variant.isLoop();
             }
         }
-        SoundEvent event = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName()).get(soundName);
+        Map<String, SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName());
+        if (sounds == null) {
+            YwzjMidi.LOGGER.warn("Unknown instrument sound set {}", instrument.getName());
+            return;
+        }
+        SoundEvent event = sounds.get(soundName);
         if (event == null) {
-            YwzjMidi.LOGGER.warn("Unknown sound sample " + soundName);
+            YwzjMidi.LOGGER.warn("Unknown sound sample {}", soundName);
             return;
         }
         MidiSound instance = new MidiSound(event,

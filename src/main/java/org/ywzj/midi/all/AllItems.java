@@ -27,7 +27,7 @@ public class AllItems {
     public static final RegistryObject<Item> FELT_MALLET = registerItem("felt_mallet_item", () -> new FeltMalletItem(new Item.Properties().stacksTo(16)));
 
     public static <T extends Item> RegistryObject<Item> registerItem(String name, Supplier<T> item) {
-        return registerItem(YwzjMidi.MODID, name, item);
+        return registerItem(YwzjMidi.MOD_ID, name, item);
     }
 
     public static <T extends Item> RegistryObject<Item> registerItem(String namespace, String name, Supplier<T> item) {

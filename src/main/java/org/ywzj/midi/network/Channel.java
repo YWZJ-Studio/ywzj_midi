@@ -17,7 +17,7 @@ import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
 public class Channel {
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(YwzjMidi.MODID, YwzjMidi.CHANNEL))
+            .named(new ResourceLocation(YwzjMidi.MOD_ID, YwzjMidi.CHANNEL))
             .networkProtocolVersion(() -> YwzjMidi.PROTOCOL)
             .clientAcceptedVersions(YwzjMidi.PROTOCOL::equals)
             .serverAcceptedVersions(YwzjMidi.PROTOCOL::equals)

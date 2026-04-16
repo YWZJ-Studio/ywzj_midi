@@ -25,7 +25,7 @@ public class AllBlocks {
     public static final RegistryObject<Block> SPEAKER_BLOCK = registerBlock("speaker_block", () -> new SpeakerBlock(BlockBehaviour.Properties.of().strength(1f)));
 
     public static <T extends Block> RegistryObject<Block> registerBlock(String name, Supplier<T> block) {
-        return registerBlock(YwzjMidi.MODID, name, block);
+        return registerBlock(YwzjMidi.MOD_ID, name, block);
     }
 
     public static <T extends Block> RegistryObject<Block> registerBlock(String namespace, String name, Supplier<T> block) {
