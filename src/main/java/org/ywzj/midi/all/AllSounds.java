@@ -17,16 +17,16 @@ public class AllSounds {
 
     public static final ConcurrentHashMap<String, DeferredRegister<SoundEvent>> SOUNDS = new ConcurrentHashMap<>();
 
-    public static final HashMap<String, LinkedHashMap<String, SoundEvent>> INSTRUMENT_WITH_SOUNDS = new LinkedHashMap<>();
+    public static final HashMap<ResourceLocation, LinkedHashMap<String, SoundEvent>> INSTRUMENT_WITH_SOUNDS = new LinkedHashMap<>();
 
     public static RegistryObject<SoundEvent> MUSIC = registerSoundEvent("music");
 
-    public static void registerKeys(String namespace, String instrumentName, int keyStart, int keyEnd, String variant) {
+    public static void registerKeys(ResourceLocation instrumentId, String instrumentName, int keyStart, int keyEnd, String variant) {
         if (keyStart <= 0 || keyEnd <= 0) {
             return;
         }
         for (int note = keyStart; note <= keyEnd; note++) {
-            registerKeysSoundEvent(namespace, instrumentName, note, variant);
+            registerKeysSoundEvent(instrumentId, instrumentName, note, variant);
         }
     }
 
@@ -34,18 +34,16 @@ public class AllSounds {
         return SOUNDS.computeIfAbsent(YwzjMidi.MOD_ID, k -> DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, YwzjMidi.MOD_ID)).register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(YwzjMidi.MOD_ID, name)));
     }
 
-    private static void registerKeysSoundEvent(String namespace, String instrumentName, int note, String variant) {
+    private static void registerKeysSoundEvent(ResourceLocation instrumentId, String instrumentName, int note, String variant) {
         String notation = MidiUtils.noteToNotation(note);
         String soundName = instrumentName + "_" + notation;
         if (variant != null && variant.length() > 0) {
             soundName += "_" + variant;
         }
-        SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(new ResourceLocation(namespace, soundName));
-        LinkedHashMap<String, SoundEvent> map = INSTRUMENT_WITH_SOUNDS.getOrDefault(instrumentName, new LinkedHashMap<>());
+        SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(new ResourceLocation(instrumentId.getNamespace(), soundName));
+        LinkedHashMap<String, SoundEvent> map = INSTRUMENT_WITH_SOUNDS.getOrDefault(instrumentId, new LinkedHashMap<>());
         map.put(soundName, soundEvent);
-        INSTRUMENT_WITH_SOUNDS.put(instrumentName, map);
-        DeferredRegister<SoundEvent> soundDeferredRegister = SOUNDS.computeIfAbsent(namespace, k -> DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, namespace));
-        soundDeferredRegister.register(soundName, () -> soundEvent);
+        INSTRUMENT_WITH_SOUNDS.put(instrumentId, map);
     }
 
     public static void register(IEventBus eventBus, String namespace) {

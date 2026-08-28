@@ -8,12 +8,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.ywzj.midi.gui.widget.CommonButton;
-import org.ywzj.midi.gui.widget.SelectableButton;
-import org.ywzj.midi.gui.widget.SelectionList;
-import org.ywzj.midi.gui.widget.SelectionListButton;
+import org.ywzj.midi.gui.ScreenManager;
+import org.ywzj.midi.gui.waterfall.WaterfallPlayer;
+import org.ywzj.midi.gui.widget.*;
 import org.ywzj.midi.instrument.Instrument;
-import org.ywzj.midi.instrument.player.InstrumentMidiPlayer;
 import org.ywzj.midi.instrument.receiver.MidiReceiver;
 import org.ywzj.midi.storage.MidiFiles;
 import org.ywzj.midi.util.ComponentUtils;
@@ -31,12 +29,14 @@ public abstract class MidiInstrumentScreen extends Screen {
 
     private boolean firstRender = true;
     protected final Instrument instrument;
-    protected final Vec3 pos;
+    public Vec3 pos;
     protected MidiDevice.Info[] midiDeviceInfo;
     private boolean isConnected = false;
-    protected MidiReceiver receiver;
-    protected InstrumentMidiPlayer midiPlayer;
+    public MidiReceiver receiver;
+    protected WaterfallPlayer midiPlayer;
+    protected ValueSlider progressBar;
     protected CommonButton deviceButton;
+    protected CommonButton waterfallButton;
     protected SelectableButton.LinkedSelections<MidiDevice.Info> deviceSelections;
     protected SelectableButton<MidiDevice.Info> deviceSelectButton;
     protected CommonButton midPlayButton;
@@ -50,7 +50,7 @@ public abstract class MidiInstrumentScreen extends Screen {
         super(titleIn);
         this.instrument = instrument;
         this.pos = pos;
-        this.midiPlayer = new InstrumentMidiPlayer(this);
+        this.midiPlayer = new WaterfallPlayer(this);
         this.receiver = instrument.receiver(Minecraft.getInstance().player, pos);
     }
 
@@ -75,11 +75,18 @@ public abstract class MidiInstrumentScreen extends Screen {
             instrument.getAllVariants().forEach(v -> variantSelections.add(new SelectionList.Selection<>(v.getIndex(), v.getName())));
             variantSelectButton = new SelectionListButton<>(width/2 + 150, height/2 - 20, -1, 20, ComponentUtils.translatable("ui.ywzj_midi.select"), variantSelections, this, ComponentUtils.EMPTY);
             variantSelectButton.setValue(0);
+            waterfallButton = new CommonButton(width/2 + 120, height/2 + 10, 60, 20,
+                    ComponentUtils.translatable("ui.ywzj_midi.waterfall"), (button) -> ScreenManager.openWaterfallScreen(midiPlayer, MidiInstrumentScreen.this));
+            progressBar = new ValueSlider(width/2 - 100, height/2 + 60, 200, 20,
+                    ComponentUtils.translatable("ui.ywzj_midi.progress").getString(), 0, 100);
+            midiPlayer.setProgressBar(progressBar);
         } else {
             deviceSelections.update(midiDeviceSelections);
             midSelectButton.updatePos(width/2 + 150, height/2 - 80);
             midSelectButton.updateSelections(midSelections);
             variantSelectButton.updatePos(width/2 + 150, height/2 - 20);
+            progressBar.updatePos(width/2 - 100, height/2 + 60);
+            waterfallButton.updatePos(width/2 + 120, height/2 + 10);
         }
         deviceButton = new CommonButton(width/2 - 50, height/2, 100, 20, ComponentUtils.translatable("ui.ywzj_midi.open_midi_device"), (button) -> {
             if (isConnected) {
@@ -114,7 +121,7 @@ public abstract class MidiInstrumentScreen extends Screen {
                 midiPlayer.getChannels().forEach(channel -> {
                     channel.use(instrument);
                     channel.volume(1);
-                    channel.registerReceiver(receiver.getPlayer());
+                    channel.registerReceiver(receiver);
                 });
                 midiPlayer.play(0);
                 button.setMessage(ComponentUtils.translatable("ui.ywzj_midi.playing"));
@@ -125,6 +132,8 @@ public abstract class MidiInstrumentScreen extends Screen {
         addRenderableWidget(midPlayButton);
         addRenderableWidget(midSelectButton);
         addRenderableWidget(variantSelectButton);
+        addRenderableWidget(progressBar);
+        addRenderableWidget(waterfallButton);
     }
 
     public void callbackPlayButton() {

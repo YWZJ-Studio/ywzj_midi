@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.audio.NotePlayer;
@@ -28,7 +29,7 @@ public class CymbalItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         if (level.isClientSide && !player.isCrouching()
                 && interactionHand.equals(InteractionHand.MAIN_HAND)) {
-            if (!player.getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AllItems.ITEMS_LOOKUP.get(AllInstruments.CYMBAL.getName()).get())) {
+            if (!player.getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AllItems.ITEMS_LOOKUP.get("cymbal").get())) {
                 player.sendSystemMessage(Component.translatable("info.ywzj_midi.need_cymbal"));
                 return InteractionResultHolder.pass(player.getItemInHand(interactionHand));
             }
@@ -36,7 +37,7 @@ public class CymbalItem extends Item {
                 cymbalPlayPose = new CymbalPlayPose(player);
             }
             cymbalPlayPose.hit();
-            NotePlayer.playNote(UUID.randomUUID(), new Vec3(player.getX(), player.getY(), player.getZ()), AllInstruments.CYMBAL, 0, MidiUtils.notationToNote("c1"), 1f, 0, player);
+            NotePlayer.playNote(UUID.randomUUID(), new Vec3(player.getX(), player.getY(), player.getZ()), AllInstruments.fromId(YwzjMidi.modLocation("cymbal")), 0, MidiUtils.notationToNote("c1"), 127, 0, player);
         }
         return InteractionResultHolder.pass(player.getItemInHand(interactionHand));
     }

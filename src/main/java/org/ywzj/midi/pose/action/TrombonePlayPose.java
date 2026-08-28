@@ -1,6 +1,7 @@
 package org.ywzj.midi.pose.action;
 
 import net.minecraft.world.entity.LivingEntity;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.pose.PoseManager;
 import org.ywzj.midi.pose.handler.TromboneSlideHandler;
@@ -19,7 +20,7 @@ public class TrombonePlayPose extends BrassPlayPose {
         Integer slide = TromboneSlideHandler.noteToSlide(note);
         playPose.rightArmRotY = (float) (slide * 0.02 - 0.5f);
         playPose.rightArmZ = -(float) slide;
-        PoseManager.publish(player, playPose, AllInstruments.TROMBONE, Collections.singletonList(note));
+        PoseManager.publish(player, playPose, AllInstruments.fromId(YwzjMidi.modLocation("trombone")), Collections.singletonList(note));
     }
 
 }

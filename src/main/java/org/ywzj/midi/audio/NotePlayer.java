@@ -35,12 +35,15 @@ public class NotePlayer {
         return SOUND_INSTANCES.get(uuid);
     }
 
-    public static void playNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, float velocity, int delay, LivingEntity player) {
+    public static void playNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, int velocity, int delay, LivingEntity player) {
+        if (instrument == null || player == null) {
+            return;
+        }
         if (player.level().isClientSide) {
             playClientNote(uuid, pos, instrument, variantId, note, velocity, delay);
             playServerNote(uuid, pos, instrument, variantId, note, velocity, delay);
         } else {
-            PlayNoteHandler.broadcastNote(player, new CPlayNote(pos, instrument.getIndex(), variantId, note, velocity, delay, uuid), false);
+            PlayNoteHandler.broadcastNote(player, new CPlayNote(pos, instrument.getInstrumentId(), variantId, note, velocity, delay, uuid), false);
         }
     }
 
@@ -62,8 +65,8 @@ public class NotePlayer {
         }
     }
 
-    public static void playServerNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, float velocity, int delay) {
-        Channel.CHANNEL.sendToServer(new CPlayNote(pos, instrument.getIndex(), variantId, note, velocity, delay, uuid));
+    public static void playServerNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, int velocity, int delay) {
+        Channel.CHANNEL.sendToServer(new CPlayNote(pos, instrument.getInstrumentId(), variantId, note, velocity, delay, uuid));
     }
 
     public static void changeServerNote(UUID uuid, float velScale) {
@@ -75,28 +78,45 @@ public class NotePlayer {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void playClientNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, float velocity, int delay) {
-        String soundName = instrument.getName() + "_" + MidiUtils.noteToNotation(note);
+    public static void playClientNote(UUID uuid, Vec3 pos, Instrument instrument, int variantId, int note, int velocity, int delay) {
+        if (instrument == null) {
+            YwzjMidi.LOGGER.warn("Unknown instrument id in note packet");
+            return;
+        }
+        String notation = MidiUtils.noteToNotation(note);
+        String baseName = instrument.getName() + "_" + notation;
         boolean loop = instrument.isLoop();
+        String variantSuffix = "";
         if (variantId > 0) {
             Instrument.Variant variant = instrument.getVariant(variantId);
             if (variant.getIndex() != 0) {
-                soundName += "_" + variant.getName();
+                variantSuffix = "_" + variant.getName();
                 loop = variant.isLoop();
             }
         }
-        Map<String, SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName());
+        Map<String, SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getInstrumentId());
         if (sounds == null) {
             YwzjMidi.LOGGER.warn("Unknown instrument sound set {}", instrument.getName());
             return;
         }
-        SoundEvent event = sounds.get(soundName);
+        // 多级力度音色
+        String velSuffix = MidiUtils.velocitySuffix(velocity);
+        SoundEvent event = sounds.get(baseName + velSuffix + variantSuffix);
+        if (event == null && !velSuffix.isEmpty()) {
+            event = sounds.get(baseName + velSuffix);
+        }
         if (event == null) {
-            YwzjMidi.LOGGER.warn("Unknown sound sample {}", soundName);
+            event = sounds.get(baseName + variantSuffix);
+        }
+        if (event == null && !variantSuffix.isEmpty()) {
+            event = sounds.get(baseName);
+        }
+        if (event == null) {
+            YwzjMidi.LOGGER.warn("Unknown sound sample {}", baseName + velSuffix + variantSuffix);
             return;
         }
         MidiSound instance = new MidiSound(event,
-                velocity,
+                MidiUtils.velocityVolume(velocity),
                 1f,
                 loop,
                 pos);

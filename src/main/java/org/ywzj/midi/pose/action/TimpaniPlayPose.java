@@ -1,6 +1,7 @@
 package org.ywzj.midi.pose.action;
 
 import net.minecraft.world.entity.LivingEntity;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.pose.PoseManager;
 
@@ -43,7 +44,7 @@ public class TimpaniPlayPose {
             PoseManager.publish(player, strikePoses.get(step % 20));
             step += 1;
         }
-        PoseManager.publish(player, strikePoses.get(step % 20), AllInstruments.TIMPANI, Collections.singletonList(note));
+        PoseManager.publish(player, strikePoses.get(step % 20), AllInstruments.fromId(YwzjMidi.modLocation("timpani")), Collections.singletonList(note));
         step += 1;
     }
 

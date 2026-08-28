@@ -79,7 +79,7 @@ public class ServerMidiPlayer extends MidiPlayer {
                     if (targetPlayers.size() == 0) {
                         targetPlayers.add(conductor);
                     }
-                    channels.get(index).use(AllInstruments.fromIndex(unit.getInstrumentId()));
+                    channels.get(index).use(AllInstruments.fromId(unit.getInstrumentIdAsResourceLocation()));
                     channels.get(index).volume((float) unit.getVol() / 127);
                     channels.get(index).clearReceiver();
                     for (LivingEntity p : targetPlayers) {

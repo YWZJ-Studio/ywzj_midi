@@ -9,7 +9,9 @@ import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Receiver;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,6 +35,13 @@ public abstract class MidiReceiver implements Receiver {
         this.player = player;
         this.pos = pos == null ? this.player.position() : pos;
         this.instrument = instrument;
+    }
+
+    public Set<Integer> getPlayedNotes() {
+        if (playedKeys.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return Set.copyOf(playedKeys.keySet());
     }
 
     public boolean initDevice(MidiDevice.Info info) {
@@ -69,7 +78,7 @@ public abstract class MidiReceiver implements Receiver {
             playedKeys.remove(note);
         }
         UUID uuid = UUID.randomUUID();
-        NotePlayer.playNote(uuid, portable ? player.position() : pos, instrument, variantId, note, (float) Math.pow((double) velocity / 127, 2) * volume, delay, player);
+        NotePlayer.playNote(uuid, portable ? player.position() : pos, instrument, variantId, note, velocity, delay, player);
         playedKeys.put(note, uuid);
     }
 

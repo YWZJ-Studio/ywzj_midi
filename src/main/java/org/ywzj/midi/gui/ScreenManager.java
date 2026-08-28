@@ -1,8 +1,10 @@
 package org.ywzj.midi.gui;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.ywzj.midi.all.AllInstruments;
@@ -10,10 +12,13 @@ import org.ywzj.midi.blockentity.AABlockEntity;
 import org.ywzj.midi.blockentity.PianoBlockEntity;
 import org.ywzj.midi.blockentity.TimpaniBlockEntity;
 import org.ywzj.midi.entity.FakePlayerEntity;
+import org.ywzj.midi.entity.InstrumentEntity;
 import org.ywzj.midi.gui.screen.*;
+import org.ywzj.midi.gui.waterfall.WaterfallPlayer;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.util.ComponentUtils;
 import org.ywzj.midi.util.MathUtils;
+import org.ywzj.midi.util.MidiUtils;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -24,122 +29,107 @@ import static org.ywzj.midi.entity.FakePlayerEntity.DEFAULT_NAME;
 public class ScreenManager {
 
     private static final ConductorScreen CONDUCTOR_SCREEN = new ConductorScreen(ComponentUtils.literal("指挥"));
-    private static ViolScreen violinScreen;
-    private static ViolScreen violaScreen;
-    private static ViolScreen celloScreen;
-    private static ViolScreen doubleBassScreen;
-    private static WoodwindScreen oboeScreen;
-    private static WoodwindScreen clarinetScreen;
-    private static WoodwindScreen fluteScreen;
-    private static WoodwindScreen bassoonScreen;
-    private static BrassScreen hornScreen;
-    private static BrassScreen trumpetScreen;
-    private static BrassScreen tromboneScreen;
-    private static BrassScreen tubaScreen;
+    private static final HashMap<String, MidiInstrumentScreen> instrumentScreens = new HashMap<>();
     private static final HashMap<UUID, ServerMidiScreen> fakePlayerConductorScreens = new HashMap<>();
 
     public static void openBatonScreen() {
         Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(CONDUCTOR_SCREEN));
     }
 
+    /**
+     * Open screen for a block-position-based instrument (piano, timpani, etc.)
+     */
     public static void openPianoScreen(BlockPos pos, Instrument instrument, PianoBlockEntity pianoBlockEntity) {
-        if (!checkDistance(pos, 3)) {
-            return;
-        }
+        if (!checkDistance(pos, 3)) return;
         if (pianoBlockEntity.clavichordScreen == null) {
             pianoBlockEntity.clavichordScreen = new ClavichordScreen(instrument, pos, ComponentUtils.literal("钢琴"), "c4", "b6");
         }
         Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(pianoBlockEntity.clavichordScreen));
     }
 
-    public static void openViolinScreen(Player player) {
-        if (violinScreen == null) {
-            violinScreen = new ViolScreen(AllInstruments.VIOLIN, player.position(), ComponentUtils.literal("小提琴"), "c4", "b6");
+    /**
+     * Generic instrument screen opener for item-based instruments.
+     * Dispatches to the correct screen based on instrument type.
+     */
+    public static void openInstrumentScreen(Instrument instrument, Player player) {
+        String name = instrument.getName();
+        MidiInstrumentScreen screen = instrumentScreens.get(name);
+        if (screen == null) {
+            screen = createScreen(instrument, player);
+            if (screen != null) {
+                instrumentScreens.put(name, screen);
+            }
         }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(violinScreen));
+        if (screen != null) {
+            final Screen finalScreen = screen;
+            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(finalScreen));
+        }
     }
 
-    public static void openViolaScreen(Player player) {
-        if (violaScreen == null) {
-            violaScreen = new ViolScreen(AllInstruments.VIOLA, player.position(), ComponentUtils.literal("中提琴"), "c3", "b5");
+    /**
+     * Open screen for an entity-based instrument (piano, timpani, bass drum, etc. placed in world).
+     */
+    public static void openInstrumentEntityScreen(Instrument instrument, InstrumentEntity entity) {
+        String name = instrument.getName();
+        MidiInstrumentScreen screen = instrumentScreens.get(name);
+        if (screen == null) {
+            screen = createEntityScreen(instrument, entity);
+            if (screen != null) {
+                instrumentScreens.put(name, screen);
+                entity.setReceiver(screen.receiver);
+            }
         }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(violaScreen));
+        if (screen != null) {
+            final MidiInstrumentScreen finalScreen = screen;
+            finalScreen.pos = entity.position();
+            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(finalScreen));
+        }
     }
 
-    public static void openCelloScreen(Player player) {
-        if (celloScreen == null) {
-            celloScreen = new ViolScreen(AllInstruments.CELLO, player.position(), ComponentUtils.literal("大提琴"), "c3", "b5");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(celloScreen));
+    private static MidiInstrumentScreen createEntityScreen(Instrument instrument, InstrumentEntity entity) {
+        return createScreenByFamily(instrument, entity.blockPosition(), entity.position());
     }
 
-    public static void openDoubleBassScreen(Player player) {
-        if (doubleBassScreen == null) {
-            doubleBassScreen = new ViolScreen(AllInstruments.DOUBLE_BASS, player.position(), ComponentUtils.literal("低音提琴"), "c1", "b3");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(doubleBassScreen));
+    private static MidiInstrumentScreen createScreen(Instrument instrument, Player player) {
+        return createScreenByFamily(instrument, player.blockPosition(), player.position());
     }
 
-    public static void openOboeScreen(Player player) {
-        if (oboeScreen == null) {
-            oboeScreen = new WoodwindScreen(AllInstruments.OBOE, player.position(), ComponentUtils.literal("双簧管"), "c4", "b6");
+    private static MidiInstrumentScreen createScreenByFamily(Instrument instrument, BlockPos blockPos, Vec3 pos) {
+        AllInstruments.Family family = instrument.getFamily();
+        if (family == null) {
+            return null;
         }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(oboeScreen));
-    }
 
-    public static void openClarinetScreen(Player player) {
-        if (clarinetScreen == null) {
-            clarinetScreen = new WoodwindScreen(AllInstruments.CLARINET, player.position(), ComponentUtils.literal("单簧管"), "c4", "b6");
+        int lowNote = MidiUtils.notationToNote(instrument.getKeyStart());
+        String kbStart, kbEnd;
+        if (lowNote >= 48) {
+            kbStart = "c4"; kbEnd = "b6";
+        } else if (lowNote >= 36) {
+            kbStart = "c3"; kbEnd = "b5";
+        } else if (lowNote >= 24) {
+            kbStart = "c2"; kbEnd = "b4";
+        } else if (lowNote >= 12) {
+            kbStart = "c1"; kbEnd = "b3";
+        } else {
+            kbStart = "c0"; kbEnd = "b2";
         }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(clarinetScreen));
-    }
 
-    public static void openFluteScreen(Player player) {
-        if (fluteScreen == null) {
-            fluteScreen = new WoodwindScreen(AllInstruments.FLUTE, player.position(), ComponentUtils.literal("长笛"), "c4", "b6");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(fluteScreen));
-    }
-
-    public static void openBassoonScreen(Player player) {
-        if (bassoonScreen == null) {
-            bassoonScreen = new WoodwindScreen(AllInstruments.BASSOON, player.position(), ComponentUtils.literal("巴松管"), "c3", "b5");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(bassoonScreen));
-    }
-
-    public static void openHornScreen(Player player) {
-        if (hornScreen == null) {
-            hornScreen = new BrassScreen(AllInstruments.HORN, player.position(), ComponentUtils.literal("圆号"), "c3", "b5");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(hornScreen));
-    }
-
-    public static void openTrumpetScreen(Player player) {
-        if (trumpetScreen == null) {
-            trumpetScreen = new BrassScreen(AllInstruments.TRUMPET, player.position(), ComponentUtils.literal("小号"), "c4", "b6");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(trumpetScreen));
-    }
-
-    public static void openTromboneScreen(Player player) {
-        if (tromboneScreen == null) {
-            tromboneScreen = new BrassScreen(AllInstruments.TROMBONE, player.position(), ComponentUtils.literal("长号"), "c3", "b5");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(tromboneScreen));
-    }
-
-    public static void openTubaScreen(Player player) {
-        if (tubaScreen == null) {
-            tubaScreen = new BrassScreen(AllInstruments.TUBA, player.position(), ComponentUtils.literal("大号"), "c2", "b4");
-        }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(tubaScreen));
+        var displayName = ComponentUtils.literal(instrument.getName());
+        return switch (family) {
+            case KEYBOARD, PERCUSSION ->
+                new ClavichordScreen(instrument, blockPos, displayName, kbStart, kbEnd);
+            case STRING ->
+                new ViolScreen(instrument, pos, displayName, kbStart, kbEnd);
+            case WOODWIND ->
+                new WoodwindScreen(instrument, pos, displayName, kbStart, kbEnd);
+            case BRASS ->
+                new BrassScreen(instrument, pos, displayName, kbStart, kbEnd);
+            default -> null;
+        };
     }
 
     public static void openSpeakerScreen(BlockPos pos, MusicPlayerScreen musicPlayerScreen) {
-        if (!checkDistance(pos, 2)) {
-            return;
-        }
+        if (!checkDistance(pos, 2)) return;
         Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(musicPlayerScreen));
     }
 
@@ -167,8 +157,14 @@ public class ScreenManager {
     }
 
     public static void openFakePlayerConductorScreen(FakePlayerEntity fakePlayerEntity) {
-        ServerMidiScreen serverMidiScreen = fakePlayerConductorScreens.computeIfAbsent(fakePlayerEntity.getUUID(), k -> new ServerMidiScreen(ComponentUtils.literal("指挥"), fakePlayerEntity));
+        ServerMidiScreen serverMidiScreen = fakePlayerConductorScreens.computeIfAbsent(
+                fakePlayerEntity.getUUID(), k -> new ServerMidiScreen(ComponentUtils.literal("指挥"), fakePlayerEntity));
         Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(serverMidiScreen));
+    }
+
+    public static void openWaterfallScreen(WaterfallPlayer waterfallPlayer, Screen parent) {
+        WaterfallScreen waterfallScreen = new WaterfallScreen(waterfallPlayer, parent, ComponentUtils.literal("瀑布"));
+        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(waterfallScreen));
     }
 
     private static boolean checkDistance(BlockPos pos, int distance) {

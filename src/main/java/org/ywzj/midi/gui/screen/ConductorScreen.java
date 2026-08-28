@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.entity.FakePlayerEntity;
+import org.ywzj.midi.gui.ScreenManager;
 import org.ywzj.midi.gui.widget.*;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.instrument.player.ConductorMidiPlayer;
@@ -28,12 +29,6 @@ public class ConductorScreen extends Screen {
     private boolean firstRender = true;
     private Player conductor;
     private final static List<SelectionList.Selection<Instrument>> INSTRUMENT_SELECTIONS = new ArrayList<>();
-    static {
-        AllInstruments.getInstruments().stream()
-                .filter(instrument -> !instrument.equals(AllInstruments.AA775))
-                .forEach(instrument -> INSTRUMENT_SELECTIONS.add(new SelectionList.Selection<>(instrument, instrument.getName())));
-        INSTRUMENT_SELECTIONS.add(new SelectionList.Selection<>(null, "NA"));
-    }
     private ConductorMidiPlayer conductorMidiPlayer;
     protected List<SelectionList.Selection<Path>> midSelections = new ArrayList<>();
     protected SelectionListButton<Path> midSelectButton;
@@ -41,6 +36,7 @@ public class ConductorScreen extends Screen {
     private CommonButton playButton;
     public ValueSlider progressBar;
     private CommonButton conductorButton;
+    private CommonButton waterfallButton;
     public boolean needConductor = true;
     public SelectionsButton<String> channelFilterButton;
     private final List<CommonButton> instrumentNameButtons = new ArrayList<>();
@@ -57,6 +53,11 @@ public class ConductorScreen extends Screen {
 
     @Override
     protected void init() {
+        INSTRUMENT_SELECTIONS.clear();
+        AllInstruments.getInstruments().stream()
+                .filter(instrument -> !"aa775".equals(instrument.getName()))
+                .forEach(instrument -> INSTRUMENT_SELECTIONS.add(new SelectionList.Selection<>(instrument, instrument.getName())));
+        INSTRUMENT_SELECTIONS.add(new SelectionList.Selection<>(null, "NA"));
         List<SelectionList.Selection<LivingEntity>> players = new ArrayList<>();
         List<Path> midPaths = MidiFiles.getMids();
         conductor = Minecraft.getInstance().player;
@@ -73,6 +74,9 @@ public class ConductorScreen extends Screen {
             conductorMidiPlayer = new ConductorMidiPlayer(this);
             midSelectButton = new SelectionListButton<>(width/2 + 130, height/2 - 80, -1, 20, ComponentUtils.translatable("ui.ywzj_midi.select_mid"), midSelections, this, ComponentUtils.translatable("info.ywzj_midi.suggestion_mid"));
             progressBar = new ValueSlider(width/2 + 130 - 80, height/2 + 10, 160, 20, ComponentUtils.translatable("ui.ywzj_midi.progress").getString(), 0, 100);
+            conductorMidiPlayer.setProgressBar(progressBar);
+            waterfallButton = new CommonButton(width/2 + 130 - 40, height/2 + 100, 60, 20,
+                    ComponentUtils.literal("瀑布"), (button) -> ScreenManager.openWaterfallScreen(conductorMidiPlayer, ConductorScreen.this));
             conductorButton = new CommonButton(width/2 + 130 - 40, height/2 + 40, 80, 20, ComponentUtils.translatable(needConductor ? "ui.ywzj_midi.conductor_on" : "ui.ywzj_midi.conductor_off"), (button) -> {
                 needConductor = !needConductor;
                 button.setMessage(ComponentUtils.translatable(needConductor ? "ui.ywzj_midi.conductor_on" : "ui.ywzj_midi.conductor_off"));
@@ -81,6 +85,7 @@ public class ConductorScreen extends Screen {
             midSelectButton.updatePos(width/2 + 130, height/2 - 80);
             midSelectButton.updateSelections(midSelections);
             progressBar.updatePos(width/2 + 130 - 80, height/2 + 10);
+            waterfallButton.updatePos(width/2 + 130 - 40, height/2 + 100);
             conductorButton.updatePos(width/2 + 130 - 40, height/2 + 40);
             updateParts();
             updateChannelFilterButton();
@@ -118,7 +123,8 @@ public class ConductorScreen extends Screen {
                     for (LivingEntity player : playersSelectButtons.get(index).getValues()) {
                         channels.get(index).registerReceiver(player);
                     }
-                    units.add(new ConductorConfig.ChannelUnit(instrumentSelectButtons.get(index).getValue() == null ? -1 : instrumentSelectButtons.get(index).getValue().getIndex(),
+                    var selInstrument = instrumentSelectButtons.get(index).getValue();
+                    units.add(new ConductorConfig.ChannelUnit(selInstrument == null ? null : selInstrument.getInstrumentId().toString(),
                             volumeSliders.get(index).value,
                             playersSelectButtons.get(index).getValues().stream()
                                     .map(player -> player.getName().getString())
@@ -153,6 +159,7 @@ public class ConductorScreen extends Screen {
         addRenderableWidget(midOpenButton);
         addRenderableWidget(playButton);
         addRenderableWidget(progressBar);
+        addRenderableWidget(waterfallButton);
         addRenderableWidget(conductorButton);
         addRenderableWidget(prePageButton);
         addRenderableWidget(nextPageButton);
@@ -179,7 +186,7 @@ public class ConductorScreen extends Screen {
             volumeSliders.add(volumeSlider);
             if (midConfig != null && midConfig.getChannelUnits().size() > index) {
                 ConductorConfig.ChannelUnit unit = midConfig.getChannelUnits().get(index);
-                instrumentSelectButton.setValue(unit.getInstrumentId() == -1 ? null : AllInstruments.fromIndex(unit.getInstrumentId()));
+                instrumentSelectButton.setValue(unit.getInstrumentIdAsResourceLocation() == null ? null : AllInstruments.fromId(unit.getInstrumentIdAsResourceLocation()));
                 List<LivingEntity> targetPlayers = players.stream()
                             .filter(playerSelection -> unit.getPlayerNames().contains(playerSelection.name))
                             .map(playerSelection -> playerSelection.value)

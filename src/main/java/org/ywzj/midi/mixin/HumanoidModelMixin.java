@@ -2,9 +2,11 @@ package org.ywzj.midi.mixin;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,8 +14,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.entity.FakePlayerEntity;
+import org.ywzj.midi.instrument.Instrument;
+import org.ywzj.midi.item.InstrumentItem;
 import org.ywzj.midi.pose.PoseManager;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 
 @Mixin(value = HumanoidModel.class)
 public class HumanoidModelMixin {
@@ -84,6 +90,16 @@ public class HumanoidModelMixin {
     }
 
     private void setHoldPose(LivingEntity player) {
+        PoseManager.PlayPose scriptPose = getScriptHoldPose(player.getMainHandItem(), InteractionHand.MAIN_HAND);
+        if (scriptPose != null) {
+            this.setPose(scriptPose);
+            return;
+        }
+        scriptPose = getScriptHoldPose(player.getOffhandItem(), InteractionHand.OFF_HAND);
+        if (scriptPose != null) {
+            this.setPose(scriptPose);
+            return;
+        }
         PoseManager.PlayPose mainHandHoldPose = PoseManager.getHoldPose(player.getMainHandItem().getItem(), InteractionHand.MAIN_HAND);
         PoseManager.PlayPose offHandHoldPose = PoseManager.getHoldPose(player.getOffhandItem().getItem(), InteractionHand.OFF_HAND);
         if (mainHandHoldPose != null) {
@@ -91,6 +107,17 @@ public class HumanoidModelMixin {
         } else if (offHandHoldPose != null) {
             this.setPose(offHandHoldPose);
         }
+    }
+
+    private PoseManager.PlayPose getScriptHoldPose(ItemStack itemStack, InteractionHand hand) {
+        if (itemStack.getItem() instanceof InstrumentItem) {
+            String i = itemStack.getOrCreateTag().getString(InstrumentItem.TAG_INSTRUMENT_ID);
+            Instrument instrument = AllInstruments.fromId(new ResourceLocation(i));
+            if (instrument != null) {
+                return MidiScriptPoseProvider.getInstance().computeHoldPose(instrument, hand);
+            }
+        }
+        return null;
     }
 
 }

@@ -5,11 +5,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.blockentity.AABlockEntity;
 import org.ywzj.midi.gui.widget.CommonButton;
 import org.ywzj.midi.gui.widget.ValueSlider;
-import org.ywzj.midi.instrument.AA775;
+import org.ywzj.midi.instrument.receiver.BlockMidiReceiver;
 import org.ywzj.midi.util.ComponentUtils;
 import org.ywzj.midi.util.MidiUtils;
 
@@ -19,9 +20,9 @@ public class AABlockScreen extends MidiInstrumentScreen {
     private final AABlockEntity aaBlockEntity;
 
     public AABlockScreen(BlockPos pos, Component titleIn, AABlockEntity aaBlockEntity) {
-        super(AllInstruments.AA775, new Vec3(pos.getX(), pos.getY(), pos.getZ()), titleIn);
+        super(AllInstruments.fromId(YwzjMidi.modLocation("aa775")), new Vec3(pos.getX(), pos.getY(), pos.getZ()), titleIn);
         this.aaBlockEntity = aaBlockEntity;
-        this.receiver = ((AA775) AllInstruments.AA775).receiver(aaBlockEntity);
+        this.receiver = new BlockMidiReceiver(aaBlockEntity);
     }
 
     @Override

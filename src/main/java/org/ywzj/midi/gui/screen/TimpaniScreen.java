@@ -2,6 +2,7 @@ package org.ywzj.midi.gui.screen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.blockentity.TimpaniBlockEntity;
 import org.ywzj.midi.gui.widget.ValueSlider;
@@ -14,7 +15,7 @@ public class TimpaniScreen extends MidiInstrumentScreen {
     private final TimpaniBlockEntity timpaniBlockEntity;
 
     public TimpaniScreen(BlockPos pos, TimpaniBlockEntity timpaniBlockEntity) {
-        super(AllInstruments.TIMPANI, new Vec3(pos.getX(), pos.getY(), pos.getZ()), ComponentUtils.literal("timpani"));
+        super(AllInstruments.fromId(YwzjMidi.modLocation("timpani")), new Vec3(pos.getX(), pos.getY(), pos.getZ()), ComponentUtils.literal("timpani"));
         this.timpaniBlockEntity = timpaniBlockEntity;
     }
 

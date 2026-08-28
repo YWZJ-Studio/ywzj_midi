@@ -46,7 +46,7 @@ public class PlayNoteHandler {
 
     private static void processServerMessage(ServerPlayer sender, SPlayNote message) {
         if (message.on) {
-            NotePlayer.playClientNote(message.uuid, new Vec3(message.x, message.y, message.z), AllInstruments.fromIndex(message.instrumentId), message.variantId, message.note, message.velocity, message.delay);
+            NotePlayer.playClientNote(message.uuid, new Vec3(message.x, message.y, message.z), AllInstruments.fromId(message.instrumentId), message.variantId, message.note, message.velocity, message.delay);
         } else {
             NotePlayer.stopClientNote(message.uuid);
         }

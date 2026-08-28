@@ -5,11 +5,16 @@ import org.ywzj.midi.gui.screen.MidiInstrumentScreen;
 
 public class InstrumentMidiPlayer extends MidiPlayer {
 
-    private final MidiInstrumentScreen midiInstrumentScreen;
+    private final Runnable endCallback;
 
     public InstrumentMidiPlayer(MidiInstrumentScreen midiInstrumentScreen) {
         super(Minecraft.getInstance().player);
-        this.midiInstrumentScreen = midiInstrumentScreen;
+        this.endCallback = midiInstrumentScreen::callbackPlayButton;
+    }
+
+    public InstrumentMidiPlayer(Runnable endCallback) {
+        super(Minecraft.getInstance().player);
+        this.endCallback = endCallback;
     }
 
     @Override
@@ -17,7 +22,7 @@ public class InstrumentMidiPlayer extends MidiPlayer {
 
     @Override
     public void endCallback() {
-        midiInstrumentScreen.callbackPlayButton();
+        endCallback.run();
     }
 
 }

@@ -23,8 +23,14 @@ public class BaseInstrumentDisplayPojo {
     @SerializedName("animations")
     public ResourceLocation animations;
 
+    @SerializedName("script")
+    public String script;
+
     @SerializedName("switchable_animations")
     public Map<String, SwitchableAnimationDefinitionPojo> switchableAnimations;
+
+    @SerializedName("display")
+    public Map<String, DisplayPojo> display;
 
     public static class SwitchableAnimationDefinitionPojo {
         @SerializedName("animation")
@@ -32,6 +38,17 @@ public class BaseInstrumentDisplayPojo {
 
         @SerializedName("invert")
         public boolean invert;
+    }
+
+    public static class DisplayPojo {
+        @SerializedName("translation")
+        public float[] translation;
+
+        @SerializedName("rotation")
+        public float[] rotation;
+
+        @SerializedName("scale")
+        public float[] scale;
     }
 
 }

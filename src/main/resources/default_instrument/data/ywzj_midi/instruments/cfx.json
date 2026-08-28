@@ -1,10 +1,12 @@
 {
-  "type": "generic",
-  "name": "piano",
+  "type": "ywzj_midi:keyboard",
+  "name": "cfx",
   "loop": false,
   "portable": false,
   "key_start": "a1",
   "key_end": "c8",
+  "family": "keyboard",
+  "item_type": "entity",
   "variants": [
     {
       "name": "raw",

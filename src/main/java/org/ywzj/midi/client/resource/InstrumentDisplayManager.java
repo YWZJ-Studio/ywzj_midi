@@ -14,6 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.custom.serialize.GsonUtil;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 import org.ywzj.midi.util.ResourceScanner;
 
 import java.util.Map;
@@ -52,8 +53,11 @@ public class InstrumentDisplayManager extends SimplePreparableReloadListener<Map
                     animationFile = ClientAssetsManager.INSTANCE.getAnimation(pojo.animations).orElse(null);
                 }
                 var display = new BaseInstrumentDisplay(displayId, modelPojo, animationFile,
-                        pojo.texture, pojo.slotTexture, pojo.switchableAnimations);
+                        pojo.texture, pojo.slotTexture, pojo.switchableAnimations, pojo.script, pojo.display);
                 builder.put(displayId, display);
+                if (pojo.script != null) {
+                    MidiScriptPoseProvider.setScriptOverride(displayId, pojo.script);
+                }
             } catch (Exception e) {
                 YwzjMidi.LOGGER.error("Failed to load instrument display: {}", displayId, e);
             }

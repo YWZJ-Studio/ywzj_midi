@@ -7,6 +7,7 @@ import org.ywzj.midi.gui.widget.CommonButton;
 import org.ywzj.midi.gui.widget.ValueSlider;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.util.ComponentUtils;
+import org.ywzj.midi.util.MidiUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,7 +31,7 @@ public abstract class PlaySustainScreen extends PlayKeyScreen {
     protected void init() {
         super.init();
         keyButtons.clear();
-        Map<String, net.minecraft.sounds.SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getName());
+        Map<String, net.minecraft.sounds.SoundEvent> sounds = AllSounds.INSTRUMENT_WITH_SOUNDS.get(instrument.getInstrumentId());
         if (sounds == null) {
             return;
         }
@@ -41,7 +42,7 @@ public abstract class PlaySustainScreen extends PlayKeyScreen {
         boolean startFlag = false;
         for (String soundName : sounds.keySet()) {
             final String notation = soundName.replace(instrument.getName() + "_", "");
-            if (notation.equals(keyStart)) {
+            if (!startFlag && MidiUtils.notationToNote(notation) >= MidiUtils.notationToNote(keyStart)) {
                 startFlag = true;
             }
             if (!startFlag) {

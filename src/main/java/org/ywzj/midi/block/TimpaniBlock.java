@@ -15,6 +15,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.audio.NotePlayer;
@@ -51,7 +52,7 @@ public class TimpaniBlock extends HorizontalBlock implements EntityBlock {
                     } else {
                         UUID uuid = UUID.randomUUID();
                         timpaniBlockEntity.timpaniPlayPose.hit(timpaniBlockEntity.note);
-                        NotePlayer.playNote(uuid, new Vec3(pos.getX(), pos.getY(), pos.getZ()), AllInstruments.TIMPANI, 0, timpaniBlockEntity.note, 1f, 0, player);
+                        NotePlayer.playNote(uuid, new Vec3(pos.getX(), pos.getY(), pos.getZ()), AllInstruments.fromId(YwzjMidi.modLocation("timpani")), 0, timpaniBlockEntity.note, 127, 0, player);
                     }
                 }
             }

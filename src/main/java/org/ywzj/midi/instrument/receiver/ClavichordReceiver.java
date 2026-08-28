@@ -4,7 +4,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.pose.PoseManager;
-import org.ywzj.midi.pose.action.PianoPlayPose;
+import org.ywzj.midi.script.MidiPoseScriptContext;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 import org.ywzj.midi.util.MathUtils;
 
 import javax.sound.midi.MidiMessage;
@@ -39,7 +40,12 @@ public class ClavichordReceiver extends MidiReceiver {
                 posePlayNotes.add(note);
                 if (timeStamp - lastTimeStamp > 10 || posePlayNotes.size() > 8) {
                     if (MathUtils.distance(player.getX(), player.getY(), player.getZ(), pos.x, pos.y, pos.z) < 3) {
-                        PianoPlayPose.handle(player, posePlayNotes);
+                        var ctx = new MidiPoseScriptContext(note, velocity, instrument.getInstrumentId());
+                        ctx.setNotes(new ArrayList<>(posePlayNotes));
+                        PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
+                        if (pose != null) {
+                            PoseManager.publish(player, pose);
+                        }
                     } else {
                         PoseManager.clearCache(player);
                     }

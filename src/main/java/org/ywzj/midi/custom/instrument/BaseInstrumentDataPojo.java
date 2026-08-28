@@ -32,6 +32,21 @@ public class BaseInstrumentDataPojo {
     @SerializedName("structure_model")
     public ResourceLocation structureModel = null;
 
+    @SerializedName("family")
+    public String family = null;
+
+    @SerializedName("tool")
+    public String tool = null;
+
+    @SerializedName("tool_hand")
+    public String toolHand = null;
+
+    @SerializedName("play_hand")
+    public String playHand = null;
+
+    @SerializedName("item_type")
+    public String itemType = "item";
+
     public static class VariantPojo {
         @SerializedName("name")
         public String name = "raw";

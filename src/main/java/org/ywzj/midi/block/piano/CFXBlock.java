@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.instrument.Instrument;
 
@@ -22,7 +23,7 @@ public class CFXBlock extends PianoBlock {
 
     @Override
     protected Instrument getInstrument() {
-        return AllInstruments.CFX;
+        return AllInstruments.fromId(YwzjMidi.modLocation("cfx"));
     }
 
     @Override

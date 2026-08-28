@@ -41,10 +41,10 @@ public class InstrumentPackResources extends PathPackResources {
             byte[] bytes = virtualSoundsJson.get(location.getNamespace());
             if (bytes != null) {
                 IoSupplier<InputStream> original = super.getResource(type, location);
-                if (original != null) {
-                    return () -> SoundFileHelper.mergeSoundsJson(original.get(), bytes);
+                if (original == null) {
+                    return () -> new ByteArrayInputStream(bytes);
                 }
-                return () -> new ByteArrayInputStream(bytes);
+                return () -> SoundFileHelper.mergeSoundsJson(original.get(), bytes);
             }
         }
         return super.getResource(type, location);

@@ -1,6 +1,7 @@
 package org.ywzj.midi.pose.action;
 
 import net.minecraft.world.entity.LivingEntity;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.pose.PoseManager;
 
@@ -43,7 +44,7 @@ public class BassDrumPlayPose {
             PoseManager.publish(player, strikePoses.get(step));
             step = (step + 1) % 20;
         }
-        PoseManager.publish(player, strikePoses.get(step), AllInstruments.BASS_DRUM, Collections.singletonList(0));
+        PoseManager.publish(player, strikePoses.get(step), AllInstruments.fromId(YwzjMidi.modLocation("bass_drum")), Collections.singletonList(0));
         step = (step + 1) % 20;
     }
 

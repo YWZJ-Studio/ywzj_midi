@@ -14,6 +14,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.ywzj.midi.custom.serialize.GsonUtil;
+import org.ywzj.midi.script.MidiScriptManager;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
@@ -23,19 +25,22 @@ import java.util.function.Consumer;
 public enum ClientAssetsManager {
 
     INSTANCE;
-
     private JsonDataManager<BedrockModelPOJO> models;
     private JsonDataManager<BedrockAnimationFile> animations;
     private InstrumentDisplayManager instrumentDisplayManager;
+    private MidiScriptManager scriptManager;
 
     public void registerListeners(Consumer<PreparableReloadListener> consumer) {
         models = new JsonDataManager<>(BedrockModelPOJO.class, GsonUtil.GSON, "models/bedrock", "BedrockModelPojo");
         animations = new JsonDataManager<>(BedrockAnimationFile.class, GsonUtil.GSON, "animations/bedrock", "BedrockAnimationPojo");
         instrumentDisplayManager = new InstrumentDisplayManager();
+        scriptManager = new MidiScriptManager();
+        MidiScriptPoseProvider.getInstance().setScriptManager(scriptManager);
 
         consumer.accept(models);
         consumer.accept(animations);
         consumer.accept(instrumentDisplayManager);
+        consumer.accept(scriptManager);
 
         consumer.accept(new SimplePreparableReloadListener<Void>() {
             @Override
@@ -58,6 +63,8 @@ public enum ClientAssetsManager {
         models.apply(models.prepare(resourceManager, null), null, null);
         animations.apply(animations.prepare(resourceManager, null), null, null);
         instrumentDisplayManager.apply(instrumentDisplayManager.prepare(resourceManager, null), null, null);
+        scriptManager.apply(scriptManager.prepare(resourceManager, null), null, null);
+        MidiScriptPoseProvider.getInstance().setScriptManager(scriptManager);
 
         instrumentDisplayManager.getDisplayMap().values().forEach(display -> {
             try {

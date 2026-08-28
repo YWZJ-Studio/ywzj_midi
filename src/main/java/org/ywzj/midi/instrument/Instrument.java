@@ -1,80 +1,96 @@
 package org.ywzj.midi.instrument;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.all.AllInstruments;
+import org.ywzj.midi.custom.instrument.BaseInstrumentData;
 import org.ywzj.midi.instrument.receiver.MidiReceiver;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class Instrument {
+public class Instrument {
 
     private static final AtomicInteger indexGenerator = new AtomicInteger(0);
-    protected final Integer index;
-    protected final String name;
-    protected final boolean loop;
-    protected final boolean portable;
-    protected final String keyStart;
-    protected final String keyEnd;
-    protected final LinkedHashMap<Integer, Variant> variants = new LinkedHashMap<>();
+    private final Integer index;
+    private final BaseInstrumentData data;
+    private AllInstruments.Family family;
 
-    public Instrument(String name, boolean loop, boolean portable, String keyStart, String keyEnd) {
+    public Instrument(BaseInstrumentData data) {
         this.index = indexGenerator.addAndGet(1);
-        this.name = name;
-        this.loop = loop;
-        this.portable = portable;
-        this.keyStart = keyStart;
-        this.keyEnd = keyEnd;
-        this.variants.put(0, new Variant(0, "raw", loop, keyStart, keyEnd));
+        this.data = data;
     }
 
-    public abstract MidiReceiver receiver(LivingEntity player, Vec3 pos);
-
-    public Instrument extra(String name, boolean loop) {
-        return extra(name, loop, keyStart, keyEnd);
+    public AllInstruments.Family getFamily() {
+        return family;
     }
 
-    public Instrument extra(String name, boolean loop, String keyStart, String keyEnd) {
-        Integer index = variants.keySet().size();
-        Variant variant = new Variant(index, name, loop, keyStart, keyEnd);
-        variants.put(index, variant);
-        return this;
+    public void setFamily(AllInstruments.Family family) {
+        this.family = family;
+    }
+
+    public MidiReceiver receiver(LivingEntity player, Vec3 pos) {
+        return data.createReceiver(this, player, pos);
     }
 
     public String getName() {
-        return name;
+        return data.getRawName();
     }
 
     public Integer getIndex() {
         return index;
     }
 
+    public ResourceLocation getInstrumentId() {
+        return data.getInstrumentId();
+    }
+
     public Boolean isLoop() {
-        return loop;
+        return data.isLoop();
     }
 
     public Boolean isPortable() {
-        return portable;
+        return data.isPortable();
     }
 
     public String getKeyStart() {
-        return keyStart;
+        return data.getKeyStart();
     }
 
     public String getKeyEnd() {
-        return keyEnd;
+        return data.getKeyEnd();
     }
 
     public Variant getVariant(int variantId) {
-        if (variantId > variants.size()) {
-            return variants.get(0);
+        if (variantId <= 0) {
+            return new Variant(0, "raw", data.isLoop(), data.getKeyStart(), data.getKeyEnd());
         }
-        return variants.get(variantId);
+        int index = 0;
+        for (BaseInstrumentData.Variant variant : data.getVariants()) {
+            if ("raw".equals(variant.getName())) {
+                continue;
+            }
+            if (index++ == variantId - 1) {
+                return new Variant(variantId, variant.getName(), variant.isLoop(), variant.getKeyStart(), variant.getKeyEnd());
+            }
+        }
+        return new Variant(0, "raw", data.isLoop(), data.getKeyStart(), data.getKeyEnd());
     }
 
     public Collection<Variant> getAllVariants() {
-        return variants.values();
+        LinkedHashMap<Integer, Variant> map = new LinkedHashMap<>();
+        map.put(0, new Variant(0, "raw", data.isLoop(), data.getKeyStart(), data.getKeyEnd()));
+        for (BaseInstrumentData.Variant v : data.getVariants()) {
+            if ("raw".equals(v.getName())) continue;
+            map.put(map.size(), new Variant(map.size(), v.getName(), v.isLoop(), v.getKeyStart(), v.getKeyEnd()));
+        }
+        return map.values();
+    }
+
+    public BaseInstrumentData getData() {
+        return data;
     }
 
     public static class Variant {
@@ -112,7 +128,5 @@ public abstract class Instrument {
         public String getKeyEnd() {
             return keyEnd;
         }
-
     }
-
 }

@@ -8,7 +8,10 @@ import net.minecraft.world.phys.Vec3;
 import org.ywzj.midi.audio.NotePlayer;
 import org.ywzj.midi.gui.widget.CommonButton;
 import org.ywzj.midi.instrument.Instrument;
-import org.ywzj.midi.pose.action.PianoPlayPose;
+import org.ywzj.midi.instrument.receiver.PercussionMidiReceiver;
+import org.ywzj.midi.pose.PoseManager;
+import org.ywzj.midi.script.MidiPoseScriptContext;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 import org.ywzj.midi.util.ComponentUtils;
 import org.ywzj.midi.util.MidiUtils;
 
@@ -36,8 +39,18 @@ public class ClavichordScreen extends PlayLegatoScreen {
     protected void playNoteOnce(String notation) {
         UUID uuid = UUID.randomUUID();
         int note = MidiUtils.notationToNote(notation);
-        NotePlayer.playNote(uuid, pos, instrument, variantSelectButton.getValue(), note, (float) Math.pow((double) velocitySlider.value / 127, 2), 0, getMinecraft().player);
-        PianoPlayPose.handle(Minecraft.getInstance().player, Collections.singletonList(note));
+        NotePlayer.playNote(uuid, pos, instrument, variantSelectButton.getValue(), note, (int) velocitySlider.value, 0, getMinecraft().player);
+        if (receiver instanceof PercussionMidiReceiver percussionReceiver) {
+            percussionReceiver.publishStrikeFrames(note, (int) velocitySlider.value);
+        } else {
+            MidiPoseScriptContext ctx = new MidiPoseScriptContext();
+            ctx.setInstrumentId(instrument.getInstrumentId());
+            ctx.setNotes(Collections.singletonList(note));
+            PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
+            if (pose != null) {
+                PoseManager.publish(Minecraft.getInstance().player, pose);
+            }
+        }
         new Thread(() -> {
             try {
                 if (uiPedal) {

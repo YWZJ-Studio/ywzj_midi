@@ -1,6 +1,7 @@
 package org.ywzj.midi.network.message;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
@@ -10,10 +11,10 @@ public class CPlayNote {
     public double x;
     public double y;
     public double z;
-    public int instrumentId;
+    public ResourceLocation instrumentId;
     public int variantId;
     public int note;
-    public float velocity;
+    public int velocity;
     public int delay;
     public boolean on;
     public UUID uuid;
@@ -24,16 +25,16 @@ public class CPlayNote {
         this.x = -1;
         this.y = -1;
         this.z = -1;
-        this.instrumentId = -1;
+        this.instrumentId = new ResourceLocation("n", "n");
         this.variantId = -1;
         this.note = -1;
-        this.velocity = -1f;
+        this.velocity = -1;
         this.delay = -1;
         this.on = false;
         this.uuid = uuid;
     }
 
-    public CPlayNote(Vec3 pos, int instrumentId, int variantId, int note, float velocity, int delay, UUID uuid) {
+    public CPlayNote(Vec3 pos, ResourceLocation instrumentId, int variantId, int note, int velocity, int delay, UUID uuid) {
         this.x = pos.x;
         this.y = pos.y;
         this.z = pos.z;
@@ -51,10 +52,10 @@ public class CPlayNote {
         data.x = buf.readDouble();
         data.y = buf.readDouble();
         data.z = buf.readDouble();
-        data.instrumentId = buf.readInt();
+        data.instrumentId = buf.readResourceLocation();
         data.variantId = buf.readInt();
         data.note = buf.readInt();
-        data.velocity = buf.readFloat();
+        data.velocity = buf.readInt();
         data.delay = buf.readInt();
         data.on = buf.readBoolean();
         data.uuid = buf.readUUID();
@@ -65,10 +66,10 @@ public class CPlayNote {
         buf.writeDouble(x);
         buf.writeDouble(y);
         buf.writeDouble(z);
-        buf.writeInt(instrumentId);
+        buf.writeResourceLocation(instrumentId);
         buf.writeInt(variantId);
         buf.writeInt(note);
-        buf.writeFloat(velocity);
+        buf.writeInt(velocity);
         buf.writeInt(delay);
         buf.writeBoolean(on);
         buf.writeUUID(uuid);

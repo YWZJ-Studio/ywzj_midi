@@ -3,21 +3,47 @@ package org.ywzj.midi.instrument.receiver;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.ywzj.midi.instrument.Instrument;
-import org.ywzj.midi.pose.action.ViolPlayPose;
+import org.ywzj.midi.pose.PoseManager;
+import org.ywzj.midi.script.MidiPoseScriptContext;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
-public abstract class ViolMidiReceiver extends MidiReceiver {
+public class ViolMidiReceiver extends MidiReceiver {
 
-    private final ViolPlayPose violPlayPose;
+    private final MidiPoseScriptContext poseContext = new MidiPoseScriptContext();
+    private long lastTimeStamp = 0;
+    private boolean bowLoop = false;
+    private boolean pauseBow = false;
 
     public ViolMidiReceiver(Instrument instrument, LivingEntity player, Vec3 pos) {
         super(instrument, player, pos);
-        this.violPlayPose = getViolPlayPose(player);
+        poseContext.setInstrumentId(instrument.getInstrumentId());
     }
 
-    public abstract ViolPlayPose getViolPlayPose(LivingEntity player);
+    private void startBowLoop() {
+        if (bowLoop) return;
+        bowLoop = true;
+        new Thread(() -> {
+            while (bowLoop) {
+                try {
+                    Thread.sleep(50);
+                } catch (Exception ignore) {}
+                if (!pauseBow) {
+                    poseContext.setTick(System.currentTimeMillis());
+                    PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
+                    if (pose != null) {
+                        PoseManager.publish(player, pose);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void stopBowLoop() {
+        bowLoop = false;
+    }
 
     @Override
     public void send(MidiMessage message, long timeStamp, int delay) {
@@ -29,21 +55,38 @@ public abstract class ViolMidiReceiver extends MidiReceiver {
                 if (velocity == 0) {
                     stopNote(note);
                     if (playedKeys.size() == 0) {
-                        violPlayPose.pause();
+                        pauseBow = true;
                     }
                     return;
                 }
                 playNote(variantId, note, velocity, delay);
                 if (variantId == 0) {
-                    violPlayPose.handle(timeStamp);
+                    // Bowing mode
+                    if (lastTimeStamp == 0 || timeStamp < lastTimeStamp) {
+                        poseContext.resetState();
+                        startBowLoop();
+                    }
+                    pauseBow = false;
+                    if (timeStamp - lastTimeStamp > 4000) {
+                        poseContext.resetState();
+                    }
                 } else {
-                    violPlayPose.pizz();
+                    // Pizzicato mode
+                    poseContext.setInt("variantId", 1);
+                    poseContext.setInt("pizzStep", 0);
+                    for (int i = 0; i < 7; i++) {
+                        PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
+                        if (pose != null) {
+                            PoseManager.publish(player, pose);
+                        }
+                    }
                 }
+                lastTimeStamp = timeStamp;
             } else if (command == ShortMessage.NOTE_OFF) {
                 int note = shortMessage.getData1();
                 stopNote(note);
-                if (playedKeys.size() == 0) {
-                    violPlayPose.pause();
+                if (playedKeys.isEmpty()) {
+                    pauseBow = true;
                 }
             } else if (command == ShortMessage.PROGRAM_CHANGE) {
                 int program = shortMessage.getData1();
@@ -52,6 +95,7 @@ public abstract class ViolMidiReceiver extends MidiReceiver {
                 } else {
                     variantId = 0;
                 }
+                poseContext.setInt("variantId", variantId);
             } else if (command == ShortMessage.CONTROL_CHANGE) {
                 commandChange(shortMessage.getData1(), shortMessage.getData2());
             }
@@ -60,7 +104,8 @@ public abstract class ViolMidiReceiver extends MidiReceiver {
 
     @Override
     public void stopPose() {
-        violPlayPose.stop();
+        stopBowLoop();
+        PoseManager.clearCache(player);
     }
 
 }

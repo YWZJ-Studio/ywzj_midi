@@ -1,6 +1,7 @@
 package org.ywzj.midi.network.message;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import org.ywzj.midi.pose.PoseManager;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class CPoseData {
     public Float rightArmRotX;
     public Float rightArmRotY;
     public Float rightArmRotZ;
-    public int instrumentId;
+    public ResourceLocation instrumentId;
     public int notesLength;
     public int[] notes;
     public UUID playerUuid;
@@ -59,7 +60,9 @@ public class CPoseData {
         data.rightArmRotX = buf.readFloat();
         data.rightArmRotY = buf.readFloat();
         data.rightArmRotZ = buf.readFloat();
-        data.instrumentId = buf.readInt();
+        if (buf.readBoolean()) {
+            data.instrumentId = buf.readResourceLocation();
+        }
         data.notesLength = buf.readInt();
         data.notes = new int[data.notesLength];
         for (int i = 0; i < data.notesLength; i++) {
@@ -82,7 +85,10 @@ public class CPoseData {
         buf.writeFloat(rightArmRotX);
         buf.writeFloat(rightArmRotY);
         buf.writeFloat(rightArmRotZ);
-        buf.writeInt(instrumentId);
+        buf.writeBoolean(instrumentId != null);
+        if (instrumentId != null) {
+            buf.writeResourceLocation(instrumentId);
+        }
         buf.writeInt(notesLength);
         for (int i = 0; i < notesLength; i++) {
             buf.writeInt(notes[i]);

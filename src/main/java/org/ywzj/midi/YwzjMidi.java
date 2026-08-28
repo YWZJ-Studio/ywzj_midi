@@ -13,7 +13,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ywzj.midi.all.*;
-import org.ywzj.midi.client.render.entity.InstrumentRenderer;
+import org.ywzj.midi.client.render.entity.InstrumentEntityRenderer;
 import org.ywzj.midi.network.Channel;
 import org.ywzj.midi.render.renderer.FakePlayerRenderer;
 import org.ywzj.midi.render.renderer.SeatRenderer;
@@ -34,7 +34,7 @@ public class YwzjMidi {
         InstrumentPackLoader.INSTANCE.scanInstrumentPacks();
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        AllInstruments.preRegister();
+        AllInstrumentDataTypes.init();
         AllHoldPose.preRegister();
         AllNotesHandler.preRegister();
         AllConfigs.register(ModLoadingContext.get());
@@ -56,7 +56,7 @@ public class YwzjMidi {
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> EntityRenderers.register(AllEntities.SEAT.get(), SeatRenderer::new));
         event.enqueueWork(() -> EntityRenderers.register(AllEntities.FAKE_PLAYER.get(), FakePlayerRenderer::new));
-        event.enqueueWork(() -> EntityRenderers.register(AllEntities.GENERIC_INSTRUMENT.get(), InstrumentRenderer::new));
+        event.enqueueWork(() -> EntityRenderers.register(AllEntities.GENERIC_INSTRUMENT.get(), InstrumentEntityRenderer::new));
     }
 
     @SuppressWarnings("removal")

@@ -31,7 +31,7 @@ public class AllEntities {
             EntityType.Builder.<InstrumentEntity>of(InstrumentEntity::new, MobCategory.MISC)
                     .sized(1.0F, 1.0F)
                     .clientTrackingRange(10)
-                    .setCustomClientFactory((spawnEntity, world) -> new InstrumentEntity(world, null)));
+                    .setCustomClientFactory((spawnEntity, world) -> new InstrumentEntity(world, null, "")));
 
     private static <T extends Entity> RegistryObject<EntityType<T>> registerEntities(String name, EntityType.Builder<T> builder)
     {

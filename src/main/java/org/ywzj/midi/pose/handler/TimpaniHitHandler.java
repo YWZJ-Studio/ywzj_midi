@@ -3,6 +3,7 @@ package org.ywzj.midi.pose.handler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -10,10 +11,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.ywzj.midi.all.AllInstruments;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.blockentity.TimpaniBlockEntity;
 import org.ywzj.midi.entity.FakePlayerEntity;
-import org.ywzj.midi.instrument.Instrument;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 public class TimpaniHitHandler extends NotesHandler {
 
     @Override
-    public Instrument getInstrument() {
-        return AllInstruments.TIMPANI;
+    public ResourceLocation getInstrumentId() {
+        return YwzjMidi.modLocation("timpani");
     }
 
     @Override

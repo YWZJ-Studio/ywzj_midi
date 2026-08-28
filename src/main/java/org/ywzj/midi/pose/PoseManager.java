@@ -2,6 +2,7 @@ package org.ywzj.midi.pose;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -21,17 +22,22 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PoseManager {
 
-    private final static HashMap<Instrument, PlayPose> MAIN_HAND_HOLD_POSE = new HashMap<>();
-    private final static HashMap<Instrument, PlayPose> OFF_HAND_HOLD_POSE = new HashMap<>();
+    private final static HashMap<ResourceLocation, PlayPose> MAIN_HAND_HOLD_POSE = new HashMap<>();
+    private final static HashMap<ResourceLocation, PlayPose> OFF_HAND_HOLD_POSE = new HashMap<>();
     private final static ConcurrentHashMap<UUID, ConcurrentLinkedQueue<PlayPose>> POSE_QUEUE = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<UUID, Pair<PlayPose, Integer>> POSE_CACHE = new ConcurrentHashMap<>();
-    private final static HashMap<Instrument, List<NotesHandler>> POSE_NOTES_HANDLER = new HashMap<>();
+    private final static HashMap<ResourceLocation, List<NotesHandler>> POSE_NOTES_HANDLER = new HashMap<>();
 
     public static void registerHoldPose(Instrument instrument, InteractionHand interactionHand, PlayPose holdPose) {
+        registerHoldPose(instrument == null ? null : instrument.getInstrumentId(), interactionHand, holdPose);
+    }
+
+    public static void registerHoldPose(ResourceLocation instrumentId, InteractionHand interactionHand, PlayPose holdPose) {
+        if (instrumentId == null) return;
         if (interactionHand.equals(InteractionHand.MAIN_HAND)) {
-            MAIN_HAND_HOLD_POSE.put(instrument, holdPose);
+            MAIN_HAND_HOLD_POSE.put(instrumentId, holdPose);
         } else if (interactionHand.equals(InteractionHand.OFF_HAND)) {
-            OFF_HAND_HOLD_POSE.put(instrument, holdPose);
+            OFF_HAND_HOLD_POSE.put(instrumentId, holdPose);
         }
     }
 
@@ -39,17 +45,17 @@ public class PoseManager {
         Instrument instrument = AllInstruments.INSTRUMENTS_LOOKUP.get(instrumentItem);
         if (instrument != null) {
             if (interactionHand.equals(InteractionHand.MAIN_HAND)) {
-                return MAIN_HAND_HOLD_POSE.get(instrument);
+                return MAIN_HAND_HOLD_POSE.get(instrument.getInstrumentId());
             } else if (interactionHand.equals(InteractionHand.OFF_HAND)) {
-                return OFF_HAND_HOLD_POSE.get(instrument);
+                return OFF_HAND_HOLD_POSE.get(instrument.getInstrumentId());
             }
         }
         return null;
     }
 
     public static void registerNotesHandler(NotesHandler notesHandler) {
-        POSE_NOTES_HANDLER.computeIfAbsent(notesHandler.getInstrument(), k -> new ArrayList<>());
-        POSE_NOTES_HANDLER.get(notesHandler.getInstrument()).add(notesHandler);
+        POSE_NOTES_HANDLER.computeIfAbsent(notesHandler.getInstrumentId(), k -> new ArrayList<>())
+                .add(notesHandler);
     }
 
     public static void publish(LivingEntity player, PlayPose pose) {
@@ -61,6 +67,8 @@ public class PoseManager {
     }
 
     public static void publish(LivingEntity player, PlayPose pose, Instrument instrument, List<Integer> notes) {
+        // Attach metadata before either local queuing or server broadcast.
+        pose.setNotes(instrument.getInstrumentId(), notes);
         if (player.level().isClientSide) {
             publishClient(player.getUUID(), pose, instrument, notes);
         } else {
@@ -77,7 +85,7 @@ public class PoseManager {
     }
 
     private static void publishClient(UUID playerUuid, PlayPose pose, Instrument instrument, List<Integer> notes) {
-        pose.setNotes(instrument.getIndex(), notes);
+        pose.setNotes(instrument.getInstrumentId(), notes);
         if (!(playerUuid.equals(Minecraft.getInstance().player.getUUID())
                 && Minecraft.getInstance().options.getCameraType().isFirstPerson())) {
             push(playerUuid, pose);
@@ -98,8 +106,12 @@ public class PoseManager {
             PlayPose pose = poses.poll();
             if (pose != null) {
                 POSE_CACHE.put(playerUuid, new Pair<>(pose, 1000));
-                if (pose.instrumentId != -1 && pose.notes.size() > 0) {
-                    POSE_NOTES_HANDLER.get(AllInstruments.fromIndex(pose.instrumentId)).forEach(notesHandler -> notesHandler.handle(playerUuid, pose.notes));
+                if (pose.instrumentId != null && pose.notes != null && !pose.notes.isEmpty()) {
+                    Instrument instrument = AllInstruments.fromId(pose.instrumentId);
+                    if (instrument != null) {
+                        POSE_NOTES_HANDLER.getOrDefault(instrument.getInstrumentId(), List.of())
+                                .forEach(notesHandler -> notesHandler.handle(playerUuid, pose.notes));
+                    }
                 }
             }
             return pose;
@@ -152,7 +164,7 @@ public class PoseManager {
         public Float rightArmRotX;
         public Float rightArmRotY;
         public Float rightArmRotZ;
-        public Integer instrumentId = -1;
+        public ResourceLocation instrumentId = null;
         public List<Integer> notes = new ArrayList<>();
 
         public PlayPose() {}
@@ -161,7 +173,7 @@ public class PoseManager {
             setPose(leftArmX, leftArmY, leftArmZ, leftArmRotX, leftArmRotY, leftArmRotZ, rightArmX, rightArmY, rightArmZ, rightArmRotX, rightArmRotY, rightArmRotZ);
         }
 
-        public PlayPose(Float leftArmX, Float leftArmY, Float leftArmZ, Float leftArmRotX, Float leftArmRotY, Float leftArmRotZ, Float rightArmX, Float rightArmY, Float rightArmZ, Float rightArmRotX, Float rightArmRotY, Float rightArmRotZ, Integer instrumentId, List<Integer> notes) {
+        public PlayPose(Float leftArmX, Float leftArmY, Float leftArmZ, Float leftArmRotX, Float leftArmRotY, Float leftArmRotZ, Float rightArmX, Float rightArmY, Float rightArmZ, Float rightArmRotX, Float rightArmRotY, Float rightArmRotZ, ResourceLocation instrumentId, List<Integer> notes) {
             setPose(leftArmX, leftArmY, leftArmZ, leftArmRotX, leftArmRotY, leftArmRotZ, rightArmX, rightArmY, rightArmZ, rightArmRotX, rightArmRotY, rightArmRotZ);
             setNotes(instrumentId, notes);
         }
@@ -170,7 +182,7 @@ public class PoseManager {
             setPose(pose.leftArmX, pose.leftArmY, pose.leftArmZ, pose.leftArmRotX, pose.leftArmRotY, pose.leftArmRotZ, pose.rightArmX, pose.rightArmY, pose.rightArmZ, pose.rightArmRotX, pose.rightArmRotY, pose.rightArmRotZ);
         }
 
-        public void setNotes(Integer instrumentId, List<Integer> notes) {
+        public void setNotes(ResourceLocation instrumentId, List<Integer> notes) {
             this.instrumentId = instrumentId;
             this.notes = notes;
         }

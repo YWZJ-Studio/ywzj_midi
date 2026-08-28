@@ -2,6 +2,7 @@ package org.ywzj.midi.instrument.receiver;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.blockentity.AABlockEntity;
 
@@ -12,7 +13,7 @@ public class BlockMidiReceiver extends MidiReceiver {
     private final AABlockEntity aaBlockEntity;
 
     public BlockMidiReceiver(AABlockEntity aaBlockEntity) {
-        super(AllInstruments.AA775, Minecraft.getInstance().player, new Vec3(aaBlockEntity.getBlockPos().getX(), aaBlockEntity.getBlockPos().getY(), aaBlockEntity.getBlockPos().getZ()));
+        super(AllInstruments.fromId(YwzjMidi.modLocation("aa775")), Minecraft.getInstance().player, new Vec3(aaBlockEntity.getBlockPos().getX(), aaBlockEntity.getBlockPos().getY(), aaBlockEntity.getBlockPos().getZ()));
         this.aaBlockEntity = aaBlockEntity;
     }
 

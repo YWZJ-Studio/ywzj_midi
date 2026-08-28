@@ -3,6 +3,7 @@ package org.ywzj.midi.instrument.player;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.LivingEntity;
 import org.ywzj.midi.gui.screen.ConductorScreen;
+import org.ywzj.midi.gui.waterfall.WaterfallPlayer;
 import org.ywzj.midi.gui.widget.ValueSlider;
 import org.ywzj.midi.pose.action.ConductorPose;
 
@@ -11,20 +12,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ConductorMidiPlayer extends MidiPlayer {
+public class ConductorMidiPlayer extends WaterfallPlayer {
 
     private final ConductorScreen conductorScreen;
     protected final ConductorPose conductorPose = new ConductorPose(Minecraft.getInstance().player);
 
     public ConductorMidiPlayer(ConductorScreen conductorScreen) {
-        super(Minecraft.getInstance().player);
+        super(conductorScreen::callbackPlayButton);
         this.conductorScreen = conductorScreen;
     }
 
     @Override
     public void handleStep() {
+        super.handleStep();
         handlePose();
-        updateProcessBar();
         updateVolume();
     }
 
@@ -63,29 +64,6 @@ public class ConductorMidiPlayer extends MidiPlayer {
             }
         } else {
             conductorPose.pause(true);
-        }
-    }
-
-    private void updateProcessBar() {
-        ValueSlider progressBar = conductorScreen.progressBar;
-        if (progressBar == null) {
-            return;
-        }
-        if (progressBar.isUpdated()) {
-            step = (int) (allEvents.size() * ((float) progressBar.value / progressBar.maxValue));
-            long targetTick = allEvents.get(step).getTick();
-            for (MidiPlayer.Channel channel : channels) {
-                channel.set(targetTick);
-            }
-            for (long lookupTick = targetTick; lookupTick >= 0; lookupTick -= 1) {
-                if (msPerTickChanges.get(lookupTick) != null) {
-                    msPerTick = msPerTickChanges.get(lookupTick);
-                    break;
-                }
-            }
-            lastTick = targetTick;
-        } else if (step % 10 == 0) {
-            progressBar.updateValue((double) step / allEvents.size());
         }
     }
 

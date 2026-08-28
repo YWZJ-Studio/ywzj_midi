@@ -15,6 +15,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.audio.NotePlayer;
@@ -43,7 +44,7 @@ public class BassDrumBlock extends HorizontalBlock implements EntityBlock {
                     bassDrumPlayPose = new BassDrumPlayPose(player);
                 }
                 bassDrumPlayPose.hit();
-                NotePlayer.playNote(UUID.randomUUID(), new Vec3(pos.getX(), pos.getY(), pos.getZ()), AllInstruments.BASS_DRUM, 0, 36, 1f, 0, player);
+                NotePlayer.playNote(UUID.randomUUID(), new Vec3(pos.getX(), pos.getY(), pos.getZ()), AllInstruments.fromId(YwzjMidi.modLocation("bass_drum")), 0, 36, 127, 0, player);
             }
         }
         return InteractionResult.PASS;

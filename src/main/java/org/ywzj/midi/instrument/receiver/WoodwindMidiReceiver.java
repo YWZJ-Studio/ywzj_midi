@@ -3,21 +3,18 @@ package org.ywzj.midi.instrument.receiver;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.ywzj.midi.instrument.Instrument;
-import org.ywzj.midi.pose.action.WoodwindPlayPose;
+import org.ywzj.midi.pose.PoseManager;
+import org.ywzj.midi.script.MidiPoseScriptContext;
+import org.ywzj.midi.script.MidiScriptPoseProvider;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
-public abstract class WoodwindMidiReceiver extends MidiReceiver {
-
-    private final WoodwindPlayPose woodwindPlayPose;
+public class WoodwindMidiReceiver extends MidiReceiver {
 
     public WoodwindMidiReceiver(Instrument instrument, LivingEntity player, Vec3 pos) {
         super(instrument, player, pos);
-        this.woodwindPlayPose = getWoodwindPlayPose(player);
     }
-
-    public abstract WoodwindPlayPose getWoodwindPlayPose(LivingEntity player);
 
     @Override
     public void send(MidiMessage message, long timeStamp, int delay) {
@@ -31,7 +28,11 @@ public abstract class WoodwindMidiReceiver extends MidiReceiver {
                     return;
                 }
                 playNote(note, velocity, delay);
-                woodwindPlayPose.play();
+                var ctx = new MidiPoseScriptContext(note, velocity, instrument.getInstrumentId());
+                PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
+                if (pose != null) {
+                    PoseManager.publish(player, pose);
+                }
             } else if (command == ShortMessage.NOTE_OFF) {
                 int note = shortMessage.getData1();
                 stopNote(note);
@@ -43,7 +44,7 @@ public abstract class WoodwindMidiReceiver extends MidiReceiver {
 
     @Override
     public void stopPose() {
-        woodwindPlayPose.stop();
+        PoseManager.clearCache(player);
     }
 
 }

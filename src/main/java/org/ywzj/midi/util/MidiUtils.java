@@ -71,6 +71,24 @@ public class MidiUtils {
         };
     }
 
+    public static String velocitySuffix(int velocity) {
+        if (velocity <= 40) {
+            return "_p";
+        } else if (velocity > 80) {
+            return "_f";
+        }
+        return "";
+    }
+
+    public static float velocityVolume(int velocity) {
+        if (velocity > 80) {
+            return velocity / 127f;
+        } else if (velocity > 40) {
+            return velocity / 80f;
+        }
+        return velocity / 40f;
+    }
+
     public static void main(String args[]) {
         int note = notationToNote("a5");
         System.out.println(note);

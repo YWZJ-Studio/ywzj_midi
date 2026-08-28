@@ -2,6 +2,7 @@ package org.ywzj.midi.instrument.player;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.instrument.receiver.MidiReceiver;
 import org.ywzj.midi.util.ComponentUtils;
 
@@ -152,7 +153,7 @@ public abstract class MidiPlayer {
 
         public String instrumentName;
         public int channelId;
-        private org.ywzj.midi.instrument.Instrument instrument;
+        private Instrument instrument;
         private float volume;
         private int index = 0;
         private final Track track;
@@ -199,7 +200,7 @@ public abstract class MidiPlayer {
             }
         }
 
-        public void use(org.ywzj.midi.instrument.Instrument instrument) {
+        public void use(Instrument instrument) {
             this.instrument = instrument;
         }
 
@@ -212,6 +213,10 @@ public abstract class MidiPlayer {
                 return;
             }
             receivers.put(player.getUUID(), instrument.receiver(player, null));
+        }
+
+        public void registerReceiver(MidiReceiver receiver) {
+            receivers.put(receiver.getPlayer().getUUID(), receiver);
         }
 
         public void clearReceiver() {

@@ -12,9 +12,11 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
 import org.ywzj.midi.YwzjMidi;
+import org.ywzj.midi.all.AllInstrumentDataTypes;
+import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.api.custom.IInstrumentDataManager;
 import org.ywzj.midi.custom.instrument.BaseInstrumentData;
-import org.ywzj.midi.custom.instrument.BaseInstrumentDataPojo;
+import org.ywzj.midi.custom.instrument.InstrumentDataType;
 import org.ywzj.midi.custom.serialize.GsonUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -52,6 +54,7 @@ public class InstrumentDataManager extends SimplePreparableReloadListener<Map<Re
                 }
             }
             indexes = parseIndexes(jsonMap);
+            AllInstruments.registerFromData(indexes);
         }
     }
 
@@ -62,16 +65,27 @@ public class InstrumentDataManager extends SimplePreparableReloadListener<Map<Re
             JsonElement instrumentDataJson = instrumentIdAndInstrumentDataJson.getValue();
             try {
                 var obj = GsonHelper.convertToJsonObject(instrumentDataJson, "instrument data");
-                // For now, we assume generic type; could parse "type" field in future
-                var pojo = GsonUtil.GSON.fromJson(instrumentDataJson, BaseInstrumentDataPojo.class);
-                if (pojo == null) {
+                String type = GsonHelper.getAsString(obj, "type", "ywzj_midi:generic");
+                ResourceLocation typeId = ResourceLocation.tryParse(type);
+                if (typeId == null) {
+                    YwzjMidi.LOGGER.warn(MARKER, "Failed to load instrument data: {}, invalid type id {}", instrumentId, type);
+                    continue;
+                }
+
+                InstrumentDataType<?> dataType = AllInstrumentDataTypes.getType(typeId);
+
+                if (dataType == null) {
+                    YwzjMidi.LOGGER.warn(MARKER, "Failed to load instrument data: {}, unknown type {}", instrumentId, typeId);
+                    continue;
+                }
+
+                var data = dataType.parse(instrumentDataJson);
+                if (data == null) {
                     YwzjMidi.LOGGER.warn(MARKER, "Failed to parse instrument data: {}", instrumentId);
                     continue;
                 }
-                var data = new BaseInstrumentData();
                 data.setInstrumentId(instrumentId);
                 data.setName(Component.translatable("instrument." + instrumentId.getNamespace() + "." + instrumentId.getPath()));
-                data.build(pojo);
                 builder.put(instrumentId, data);
             } catch (Exception e) {
                 YwzjMidi.LOGGER.error(MARKER, "Failed to load instrument data: {}", instrumentId, e);
@@ -98,6 +112,7 @@ public class InstrumentDataManager extends SimplePreparableReloadListener<Map<Re
     @Override
     public void apply(Map<ResourceLocation, JsonElement> resources, ResourceManager manager, ProfilerFiller profiler) {
         indexes = parseIndexes(resources);
+        AllInstruments.registerFromData(indexes);
     }
 
     public static void fromNetwork(Map<ResourceLocation, String> map) {

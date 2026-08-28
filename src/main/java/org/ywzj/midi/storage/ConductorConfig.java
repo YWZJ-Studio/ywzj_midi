@@ -2,6 +2,7 @@ package org.ywzj.midi.storage;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -105,21 +106,25 @@ public class ConductorConfig {
 
     public static class ChannelUnit {
 
-        private int instrumentId;
+        private String instrumentId;
         private int vol;
         private List<String> playerNames;
 
-        public ChannelUnit(int instrumentId, int vol, List<String> playerNames) {
+        public ChannelUnit(String instrumentId, int vol, List<String> playerNames) {
             this.instrumentId = instrumentId;
             this.vol = vol;
             this.playerNames = playerNames;
         }
 
-        public int getInstrumentId() {
+        public String getInstrumentId() {
             return instrumentId;
         }
 
-        public void setInstrumentId(int instrumentId) {
+        public ResourceLocation getInstrumentIdAsResourceLocation() {
+            return instrumentId != null ? ResourceLocation.tryParse(instrumentId) : null;
+        }
+
+        public void setInstrumentId(String instrumentId) {
             this.instrumentId = instrumentId;
         }
 

@@ -1,0 +1,14 @@
+{
+  "type": "ywzj_midi:percussion",
+  "name": "timpani",
+  "loop": false,
+  "portable": false,
+  "key_start": "c2",
+  "key_end": "as4",
+  "family": "percussion",
+  "item_type": "block",
+  "variants": [
+    {"name": "raw", "loop": false, "key_start": "c2", "key_end": "as4"}
+  ],
+  "structure_model": "ywzj_midi:models/bedrock/instrument/timpani"
+}

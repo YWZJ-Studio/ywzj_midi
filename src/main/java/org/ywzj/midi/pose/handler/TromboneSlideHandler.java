@@ -7,9 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.ywzj.midi.YwzjMidi;
-import org.ywzj.midi.all.AllInstruments;
 import org.ywzj.midi.all.AllItems;
-import org.ywzj.midi.instrument.Instrument;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +21,8 @@ public class TromboneSlideHandler extends NotesHandler {
     private static final ConcurrentHashMap<UUID, Integer> CACHE_SLIDE = new ConcurrentHashMap<>();
 
     @Override
-    public Instrument getInstrument() {
-        return AllInstruments.TROMBONE;
+    public ResourceLocation getInstrumentId() {
+        return YwzjMidi.modLocation("trombone");
     }
 
     @Override
@@ -49,7 +47,7 @@ public class TromboneSlideHandler extends NotesHandler {
 
     @SubscribeEvent
     public static void propertyOverrideRegistry(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> ItemProperties.register(AllItems.ITEMS_LOOKUP.get("trombone").get(),
+        event.enqueueWork(() -> ItemProperties.register(AllItems.INSTRUMENT_ITEM.get(),
                 new ResourceLocation(YwzjMidi.MOD_ID, "note"),
                 (itemStack, clientWorld, player, tag) -> {
                     if (player != null) {
