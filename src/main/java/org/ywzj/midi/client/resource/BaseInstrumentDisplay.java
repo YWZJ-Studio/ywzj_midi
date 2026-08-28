@@ -28,13 +28,15 @@ public class BaseInstrumentDisplay {
     @Nullable
     private final String script;
     private final Map<ItemDisplayContext, Display> displays;
+    private final int tabIndex;
 
     public BaseInstrumentDisplay(ResourceLocation displayId, BedrockModelPOJO modelPojo,
                                  @Nullable BedrockAnimationFile animationFile,
                                  ResourceLocation texture, ResourceLocation slotTexture,
                                  @Nullable Map<String, BaseInstrumentDisplayPojo.SwitchableAnimationDefinitionPojo> switchableAnimationPojos,
                                  @Nullable String script,
-                                 @Nullable Map<String, BaseInstrumentDisplayPojo.DisplayPojo> displayPojos) {
+                                 @Nullable Map<String, BaseInstrumentDisplayPojo.DisplayPojo> displayPojos,
+                                 int tabIndex) {
         this.displayId = displayId;
         this.model = modelPojo != null ? new BedrockModel(modelPojo) : null;
         this.texture = texture;
@@ -44,6 +46,7 @@ public class BaseInstrumentDisplay {
         this.primarySwitchableAnimation = this.switchableAnimations.values().stream().findFirst().orElse(null);
         this.script = script;
         this.displays = parseDisplays(displayPojos);
+        this.tabIndex = tabIndex;
         validateSwitchableAnimations();
     }
 
@@ -97,6 +100,14 @@ public class BaseInstrumentDisplay {
 
     public ResourceLocation getSlotTexture() {
         return slotTexture;
+    }
+
+    public int getTabIndex() {
+        return tabIndex;
+    }
+
+    public boolean hasCustomItemRenderer() {
+        return slotTexture != null || model != null && texture != null;
     }
 
     public Map<String, BedrockAnimation> getAnimations() {

@@ -32,6 +32,9 @@ public class BaseInstrumentDisplayPojo {
     @SerializedName("display")
     public Map<String, DisplayPojo> display;
 
+    @SerializedName("tab_index")
+    public int tabIndex;
+
     public static class SwitchableAnimationDefinitionPojo {
         @SerializedName("animation")
         public String animation;

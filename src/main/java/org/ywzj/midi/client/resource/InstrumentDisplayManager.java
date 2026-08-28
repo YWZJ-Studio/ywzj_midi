@@ -53,7 +53,7 @@ public class InstrumentDisplayManager extends SimplePreparableReloadListener<Map
                     animationFile = ClientAssetsManager.INSTANCE.getAnimation(pojo.animations).orElse(null);
                 }
                 var display = new BaseInstrumentDisplay(displayId, modelPojo, animationFile,
-                        pojo.texture, pojo.slotTexture, pojo.switchableAnimations, pojo.script, pojo.display);
+                        pojo.texture, pojo.slotTexture, pojo.switchableAnimations, pojo.script, pojo.display, pojo.tabIndex);
                 builder.put(displayId, display);
                 if (pojo.script != null) {
                     MidiScriptPoseProvider.setScriptOverride(displayId, pojo.script);

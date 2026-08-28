@@ -51,7 +51,7 @@ public class InstrumentItemRenderer extends BlockEntityWithoutLevelRenderer {
             return;
         }
         BaseInstrumentDisplay display = ClientAssetsManager.INSTANCE.getInstrumentDisplay(displayId).orElse(null);
-        if (display != null) {
+        if (display != null && display.hasCustomItemRenderer()) {
             poseStack.pushPose();
             {
                 poseStack.translate(0.5, 0.5, 0.5);

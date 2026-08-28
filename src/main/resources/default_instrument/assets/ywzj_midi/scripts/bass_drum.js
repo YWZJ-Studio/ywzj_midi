@@ -1,30 +1,26 @@
-// Bass Drum strike animation: 20 frames of mallet motion
-// Pre-computed strike poses matching BassDrumPlayPose.java
-
 function getStrikePose(context) {
-    // The hardcoded sequence advances before publishing its first pose.
-    var frame = (context.getInt("strikeFrame", 0) + 1) % 20;
-    context.setInt("strikeFrame", frame);
+    var frame = (context.getInt("strikeFrame", 0) + 1) % 20
+    context.setInt("strikeFrame", frame)
 
-    let offset;
+    let offset
     if (frame < 5) {
-        offset = frame * 0.06;
+        offset = frame * 0.06
     } else if (frame < 15) {
-        offset = 0.3 - (frame - 5) * 0.06;
+        offset = 0.3 - (frame - 5) * 0.06
     } else {
-        offset = -0.3 + (frame - 15) * 0.06;
+        offset = -0.3 + (frame - 15) * 0.06
     }
 
-    var builder = createPoseBuilder();
-    builder.setLeftArm(-0.9 + offset, 0.3, 0, null, null, null);
-    builder.setRightArm(-0.9 - offset, -0.3, 0, null, null, null);
-    return builder;
+    var builder = createPoseBuilder()
+    builder.setLeftArm(-0.9 + offset, 0.3, 0, null, null, null)
+    builder.setRightArm(-0.9 - offset, -0.3, 0, null, null, null)
+    return builder
 }
 
 function getPlayPose(context) {
-    return getStrikePose(context);
+    return getStrikePose(context)
 }
 
 function getHoldPose() {
-    return createPoseBuilder();
+    return createPoseBuilder()
 }

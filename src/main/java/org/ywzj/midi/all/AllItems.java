@@ -15,13 +15,14 @@ import java.util.function.Supplier;
 public class AllItems {
 
     public static final ConcurrentHashMap<String, DeferredRegister<Item>> ITEMS = new ConcurrentHashMap<>();
-    public static final LinkedHashMap<String, RegistryObject<Item>> ITEMS_LOOKUP = new LinkedHashMap<>();
+    public static final LinkedHashMap<String, RegistryObject<? extends Item>> ITEMS_LOOKUP = new LinkedHashMap<>();
 
-    public static final RegistryObject<Item> MUSIC_PLAYER = registerItem("music_player_item", () -> new MusicPlayerItem(new Item.Properties().stacksTo(1)), true);
-    public static final RegistryObject<Item> BATON = registerItem("baton_item", () -> new BatonItem(new Item.Properties().stacksTo(1)), true);
-    public static final RegistryObject<Item> INSTRUMENT_ITEM = registerItem("instrument_item", () -> new InstrumentItem(new Item.Properties().stacksTo(1)), false);
-    public static final RegistryObject<Item> INSTRUMENT_ENTITY_ITEM = registerItem("instrument_entity_item", () -> new InstrumentEntityItem(new Item.Properties().stacksTo(1)), false);
-    public static final RegistryObject<Item> INSTRUMENT_TOOL_ITEM = registerItem("instrument_tool_item", () -> new InstrumentToolItem(new Item.Properties().stacksTo(1)), false);
+    public static final RegistryObject<MusicPlayerItem> MUSIC_PLAYER = registerItem("music_player_item", () -> new MusicPlayerItem(new Item.Properties().stacksTo(1)), true);
+    public static final RegistryObject<BatonItem> BATON = registerItem("baton_item", () -> new BatonItem(new Item.Properties().stacksTo(1)), true);
+    public static final RegistryObject<InstrumentItem> INSTRUMENT_ITEM = registerItem("instrument_item", () -> new InstrumentItem(new Item.Properties().stacksTo(1)), false);
+    public static final RegistryObject<InstrumentEntityItem> INSTRUMENT_ENTITY_ITEM = registerItem("instrument_entity_item", () -> new InstrumentEntityItem(new Item.Properties().stacksTo(1)), false);
+    public static final RegistryObject<InstrumentToolItem> INSTRUMENT_TOOL_ITEM = registerItem("instrument_tool_item", () -> new InstrumentToolItem(new Item.Properties().stacksTo(1)), false);
+    public static final RegistryObject<PlainTextureItem> PLAIN_TEXTURE_ITEM = registerItem("plain_texture_item", () -> new PlainTextureItem(new Item.Properties().stacksTo(1)), false);
     // 仅用于读取java模型
     public static final RegistryObject<Item> VIOLIN = registerItem("violin", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> U1H = registerItem("u1h", () -> new Item(new Item.Properties().stacksTo(1)), false);
@@ -45,15 +46,15 @@ public class AllItems {
     public static final RegistryObject<Item> FELT_MALLET = registerItem("felt_mallet_item", () -> new Item(new Item.Properties().stacksTo(16)), false);
     public static final RegistryObject<Item> AA775 = registerItem("aa775", () -> new Item(new Item.Properties().stacksTo(1)), false);
 
-    public static <T extends Item> RegistryObject<Item> registerItem(String name, Supplier<T> item, boolean tab) {
+    public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item, boolean tab) {
         return registerItem(YwzjMidi.MOD_ID, name, item, tab);
     }
 
-    public static <T extends Item> RegistryObject<Item> registerItem(String namespace, String name, Supplier<T> item, boolean tab) {
+    public static <T extends Item> RegistryObject<T> registerItem(String namespace, String name, Supplier<T> item, boolean tab) {
         DeferredRegister<Item> itemDeferredRegister = ITEMS.computeIfAbsent(namespace, k -> DeferredRegister.create(ForgeRegistries.ITEMS, namespace));
-        RegistryObject<Item> registryObject = itemDeferredRegister.register(name, item);
+        RegistryObject<T> registryObject = itemDeferredRegister.register(name, item);
         if (tab) {
-            AllTabs.TAB_ITEMS.add(registryObject);
+            AllTabs.MISC_ITEMS.add(registryObject);
         }
         AllItems.ITEMS_LOOKUP.put(name, registryObject);
         return registryObject;

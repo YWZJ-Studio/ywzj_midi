@@ -12,7 +12,9 @@ import org.ywzj.midi.util.SoundFileHelper;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class InstrumentPackResources extends PathPackResources {
 
@@ -51,6 +53,17 @@ public class InstrumentPackResources extends PathPackResources {
     }
 
     @Override
+    public Set<String> getNamespaces(PackType type) {
+        Set<String> namespaces = super.getNamespaces(type);
+        if (type != PackType.CLIENT_RESOURCES || virtualSoundsJson.isEmpty()) {
+            return namespaces;
+        }
+        Set<String> result = new LinkedHashSet<>(namespaces);
+        result.addAll(virtualSoundsJson.keySet());
+        return Set.copyOf(result);
+    }
+
+    @Override
     public void listResources(PackType type, String namespace, String path, ResourceOutput resourceOutput) {
         super.listResources(type, namespace, path, resourceOutput);
         if (type != PackType.CLIENT_RESOURCES) {
@@ -58,9 +71,11 @@ public class InstrumentPackResources extends PathPackResources {
         }
         if ((SoundFileHelper.SOUNDS_JSON.startsWith(path) || path.startsWith(SoundFileHelper.SOUNDS_JSON))
                 && virtualSoundsJson.containsKey(namespace)) {
-            byte[] bytes = virtualSoundsJson.get(namespace);
             ResourceLocation location = YwzjMidi.resourceLocation(namespace, SoundFileHelper.SOUNDS_JSON);
-            resourceOutput.accept(location, () -> new ByteArrayInputStream(bytes));
+            IoSupplier<InputStream> resource = getResource(type, location);
+            if (resource != null) {
+                resourceOutput.accept(location, resource);
+            }
         }
     }
 

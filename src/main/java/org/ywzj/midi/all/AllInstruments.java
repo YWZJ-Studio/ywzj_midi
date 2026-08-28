@@ -3,7 +3,9 @@ package org.ywzj.midi.all;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.ywzj.midi.custom.instrument.BaseInstrumentData;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.item.InstrumentEntityItem;
@@ -24,15 +26,12 @@ public class AllInstruments {
     public static void registerFromData(Map<ResourceLocation, BaseInstrumentData> dataMap) {
         ALL_INSTRUMENTS_BY_ID.clear();
         INSTRUMENTS_LOOKUP.clear();
-        AllTabs.INSTRUMENT_STACKS.clear();
         AllSounds.INSTRUMENT_WITH_SOUNDS.clear();
-
         for (var entry : dataMap.entrySet()) {
             BaseInstrumentData data = entry.getValue();
             Instrument instrument = new Instrument(data);
             ALL_INSTRUMENTS_BY_ID.put(instrument.getInstrumentId(), instrument);
             registerSounds(data);
-            addInstrumentToCreativeTab(data, instrument);
             var itemLookup = AllItems.ITEMS_LOOKUP.get(data.getRawName());
             if (itemLookup != null) {
                 INSTRUMENTS_LOOKUP.put(itemLookup.get(), instrument);
@@ -43,23 +42,26 @@ public class AllInstruments {
         }
     }
 
-    private static void addInstrumentToCreativeTab(BaseInstrumentData data, Instrument instrument) {
-        ResourceLocation id = instrument.getInstrumentId();
+    public static List<ItemStack> createCreativeTabStacks(Instrument instrument) {
+        BaseInstrumentData data = instrument.getData();
+        ResourceLocation id = data.getInstrumentId();
         Component name = data.getName();
-        ItemStack itemStack;
+        List<ItemStack> stacks = new ArrayList<>();
+        if (data.getTool() != null) {
+            stacks.add(InstrumentToolItem.createInstance(data));
+        }
         String itemType = data.getItemType() != null ? data.getItemType() : "item";
         if (itemType.equals("entity")) {
-            itemStack = InstrumentEntityItem.createInstance(id, name);
+            stacks.add(InstrumentEntityItem.createInstance(id, name));
         } else if (itemType.equals("block")) {
-            // BlockItem is already added to the creative tab via AllBlocks.registerBlock()
-            return;
+            var item = ForgeRegistries.ITEMS.getValue(id);
+            if (item != null && item != Items.AIR) {
+                stacks.add(item.getDefaultInstance());
+            }
         } else {
-            itemStack = InstrumentItem.createInstance(id, name);
+            stacks.add(InstrumentItem.createInstance(id, name));
         }
-        if (data.getTool() != null) {
-            AllTabs.INSTRUMENT_STACKS.add(() -> InstrumentToolItem.createInstance(data));
-        }
-        AllTabs.INSTRUMENT_STACKS.add(() -> itemStack);
+        return stacks;
     }
 
     private static void registerSounds(BaseInstrumentData data) {

@@ -1,5 +1,6 @@
 {
   "tab.ywzj_midi": "永无止境: 音乐会",
+  "tab.ywzj_midi.misc": "永无止境: 音乐会 - 杂项",
 
   "ui.ywzj_midi.open_midi_device": "连接Midi设备",
   "ui.ywzj_midi.open_mid_file": "打开Mid文件",
