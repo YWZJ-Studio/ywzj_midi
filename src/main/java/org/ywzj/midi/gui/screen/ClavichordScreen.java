@@ -1,6 +1,5 @@
 package org.ywzj.midi.gui.screen;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -15,6 +14,7 @@ import org.ywzj.midi.script.MidiScriptPoseProvider;
 import org.ywzj.midi.util.ComponentUtils;
 import org.ywzj.midi.util.MidiUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -37,18 +37,19 @@ public class ClavichordScreen extends PlayLegatoScreen {
     }
 
     protected void playNoteOnce(String notation) {
-        UUID uuid = UUID.randomUUID();
+        UUID uiNoteUuid = UUID.randomUUID();
         int note = MidiUtils.notationToNote(notation);
-        NotePlayer.playNote(uuid, pos, instrument, variantSelectButton.getValue(), note, (int) velocitySlider.value, 0, getMinecraft().player);
         if (receiver instanceof PercussionMidiReceiver percussionReceiver) {
             percussionReceiver.publishStrikeFrames(note, (int) velocitySlider.value);
+            NotePlayer.playNote(uiNoteUuid, pos, instrument, variantSelectButton.getValue(), note, velocitySlider.value, 0, getMinecraft().player);
         } else {
+            receiver.playNote(variantSelectButton.getValue(), note, (int) velocitySlider.value, 0);
             MidiPoseScriptContext ctx = new MidiPoseScriptContext();
             ctx.setInstrumentId(instrument.getInstrumentId());
             ctx.setNotes(Collections.singletonList(note));
             PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
             if (pose != null) {
-                PoseManager.publish(Minecraft.getInstance().player, pose);
+                publishPose(pose, instrument, new ArrayList<>(receiver.getPlayedNotes()));
             }
         }
         new Thread(() -> {
@@ -59,7 +60,12 @@ public class ClavichordScreen extends PlayLegatoScreen {
                     Thread.sleep(800);
                 }
             } catch (Exception ignore) {}
-            NotePlayer.stopNote(uuid, getMinecraft().player);
+            if (receiver instanceof PercussionMidiReceiver) {
+                NotePlayer.stopNote(uiNoteUuid, getMinecraft().player);
+            } else {
+                receiver.stopNote(note);
+                publishPose(new PoseManager.PlayPose(), instrument, new ArrayList<>(receiver.getPlayedNotes()));
+            }
         }).start();
     }
 

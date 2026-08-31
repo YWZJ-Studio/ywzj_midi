@@ -17,10 +17,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
-import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.audio.NotePlayer;
 import org.ywzj.midi.blockentity.TimpaniBlockEntity;
 import org.ywzj.midi.gui.ScreenManager;
+import org.ywzj.midi.item.InstrumentToolItem;
 import org.ywzj.midi.pose.action.TimpaniPlayPose;
 
 import java.util.UUID;
@@ -46,7 +46,7 @@ public class TimpaniBlock extends HorizontalBlock implements EntityBlock {
             if (hand.equals(InteractionHand.MAIN_HAND)) {
                 if (player.isCrouching()) {
                     ScreenManager.openTimpaniScreen(pos, timpaniBlockEntity);
-                } else if (player.getItemInHand(hand).is(AllItems.FELT_MALLET.get())) {
+                } else if (InstrumentToolItem.matches(player.getItemInHand(hand), AllInstruments.fromId(YwzjMidi.modLocation("bass_drum")))) {
                     if (timpaniBlockEntity.timpaniPlayPose == null) {
                         timpaniBlockEntity.timpaniPlayPose = new TimpaniPlayPose(player);
                     } else {

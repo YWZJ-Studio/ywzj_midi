@@ -34,7 +34,7 @@ public class ViolScreen extends PlaySustainScreen {
                 if (!pauseBow) {
                     PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
                     if (pose != null) {
-                        PoseManager.publish(getMinecraft().player, pose);
+                        publishPose(pose);
                     }
                 }
             }
@@ -63,7 +63,7 @@ public class ViolScreen extends PlaySustainScreen {
                 for (int i = 0; i < 7; i++) {
                     PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
                     if (pose != null) {
-                        PoseManager.publish(getMinecraft().player, pose);
+                        publishPose(pose);
                     }
                 }
             }

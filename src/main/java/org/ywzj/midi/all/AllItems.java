@@ -43,7 +43,7 @@ public class AllItems {
     public static final RegistryObject<Item> VIOLA_BOW = registerItem("viola_bow", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> CELLO_BOW = registerItem("cello_bow", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> DOUBLE_BASS_BOW = registerItem("double_bass_bow", () -> new Item(new Item.Properties().stacksTo(1)), false);
-    public static final RegistryObject<Item> FELT_MALLET = registerItem("felt_mallet_item", () -> new Item(new Item.Properties().stacksTo(16)), false);
+    public static final RegistryObject<Item> FELT_MALLET = registerItem("felt_mallet_item", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> AA775 = registerItem("aa775", () -> new Item(new Item.Properties().stacksTo(1)), false);
 
     public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item, boolean tab) {

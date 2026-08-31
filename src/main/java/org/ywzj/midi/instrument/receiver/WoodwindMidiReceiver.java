@@ -31,7 +31,7 @@ public class WoodwindMidiReceiver extends MidiReceiver {
                 var ctx = new MidiPoseScriptContext(note, velocity, instrument.getInstrumentId());
                 PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
                 if (pose != null) {
-                    PoseManager.publish(player, pose);
+                    publish(pose);
                 }
             } else if (command == ShortMessage.NOTE_OFF) {
                 int note = shortMessage.getData1();
@@ -44,7 +44,7 @@ public class WoodwindMidiReceiver extends MidiReceiver {
 
     @Override
     public void stopPose() {
-        PoseManager.clearCache(player);
+        clearPose();
     }
 
 }

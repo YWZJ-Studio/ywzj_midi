@@ -4,6 +4,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.ywzj.midi.audio.NotePlayer;
 import org.ywzj.midi.instrument.Instrument;
+import org.ywzj.midi.pose.PoseManager;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
@@ -29,6 +30,7 @@ public abstract class MidiReceiver implements Receiver {
     protected int variantId = 0;
     protected int cc7Data = 127;
     protected float volume = 1f;
+    private int instrumentEntityId = -1;
 
     public MidiReceiver(Instrument instrument, LivingEntity player, Vec3 pos) {
         this.portable = instrument.isPortable();
@@ -122,6 +124,30 @@ public abstract class MidiReceiver implements Receiver {
 
     public boolean useLoop() {
         return instrument.getVariant(variantId).isLoop();
+    }
+
+    public void setInstrumentEntityId(int instrumentEntityId) {
+        this.instrumentEntityId = instrumentEntityId;
+    }
+
+    protected void publish(PoseManager.PlayPose pose) {
+        if (pose != null) {
+            pose.setInstrumentEntityId(instrumentEntityId);
+        }
+        PoseManager.publish(player, pose);
+    }
+
+    protected void publish(PoseManager.PlayPose pose, Instrument instrument, java.util.List<Integer> notes) {
+        if (pose != null) {
+            pose.setInstrumentEntityId(instrumentEntityId);
+        }
+        PoseManager.publish(player, pose, instrument, notes);
+    }
+
+    protected void clearPose() {
+        PoseManager.PlayPose pose = new PoseManager.PlayPose();
+        pose.setNotes(instrument.getInstrumentId(), Collections.emptyList());
+        publish(pose);
     }
 
     @Override

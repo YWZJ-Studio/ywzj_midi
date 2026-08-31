@@ -34,26 +34,28 @@ public class ClavichordReceiver extends MidiReceiver {
                 int velocity = shortMessage.getData2();
                 if (velocity == 0) {
                     stopNote(note);
+                    publishActiveNotes();
                     return;
                 }
                 playNote(note, velocity, delay);
                 posePlayNotes.add(note);
-                if (timeStamp - lastTimeStamp > 10 || posePlayNotes.size() > 8) {
+                if ((posePlayNotes.size() == 1 && lastTimeStamp == 0) || timeStamp - lastTimeStamp > 10 || posePlayNotes.size() > 8) {
                     if (MathUtils.distance(player.getX(), player.getY(), player.getZ(), pos.x, pos.y, pos.z) < 3) {
                         var ctx = new MidiPoseScriptContext(note, velocity, instrument.getInstrumentId());
                         ctx.setNotes(new ArrayList<>(posePlayNotes));
                         PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
                         if (pose != null) {
-                            PoseManager.publish(player, pose);
+                            publish(pose, instrument, new ArrayList<>(getPlayedNotes()));
                         }
                     } else {
-                        PoseManager.clearCache(player);
+                        clearPose();
                     }
                     posePlayNotes.clear();
                     lastTimeStamp = timeStamp;
                 }
             } else if (command == ShortMessage.NOTE_OFF) {
                 stopNote(shortMessage.getData1());
+                publishActiveNotes();
             } else if (command == ShortMessage.CONTROL_CHANGE) {
                 commandChange(shortMessage.getData1(), shortMessage.getData2());
             }
@@ -62,7 +64,13 @@ public class ClavichordReceiver extends MidiReceiver {
 
     @Override
     public void stopPose() {
-        PoseManager.clearCache(player);
+        stopAllKeys();
+        clearPose();
+        publishActiveNotes();
+    }
+
+    private void publishActiveNotes() {
+        publish(new PoseManager.PlayPose(), instrument, new ArrayList<>(getPlayedNotes()));
     }
 
 }

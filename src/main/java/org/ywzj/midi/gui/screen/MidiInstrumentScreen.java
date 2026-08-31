@@ -13,6 +13,7 @@ import org.ywzj.midi.gui.waterfall.WaterfallPlayer;
 import org.ywzj.midi.gui.widget.*;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.instrument.receiver.MidiReceiver;
+import org.ywzj.midi.pose.PoseManager;
 import org.ywzj.midi.storage.MidiFiles;
 import org.ywzj.midi.util.ComponentUtils;
 import org.ywzj.midi.util.MathUtils;
@@ -33,6 +34,7 @@ public abstract class MidiInstrumentScreen extends Screen {
     protected MidiDevice.Info[] midiDeviceInfo;
     private boolean isConnected = false;
     public MidiReceiver receiver;
+    public int instrumentEntityId = -1;
     protected WaterfallPlayer midiPlayer;
     protected ValueSlider progressBar;
     protected CommonButton deviceButton;
@@ -58,6 +60,26 @@ public abstract class MidiInstrumentScreen extends Screen {
         if (receiver != null) {
             receiver.close();
         }
+    }
+
+    protected void publishPose(PoseManager.PlayPose pose) {
+        if (pose != null) {
+            pose.setInstrumentEntityId(instrumentEntityId);
+        }
+        PoseManager.publish(Minecraft.getInstance().player, pose);
+    }
+
+    protected void publishPose(PoseManager.PlayPose pose, Instrument instrument, List<Integer> notes) {
+        if (pose != null) {
+            pose.setInstrumentEntityId(instrumentEntityId);
+        }
+        PoseManager.publish(Minecraft.getInstance().player, pose, instrument, notes);
+    }
+
+    protected void clearPublishedPose() {
+        PoseManager.PlayPose pose = new PoseManager.PlayPose();
+        pose.setNotes(instrument.getInstrumentId(), List.of());
+        publishPose(pose);
     }
 
     @Override

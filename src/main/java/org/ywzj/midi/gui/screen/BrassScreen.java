@@ -24,7 +24,7 @@ public class BrassScreen extends PlaySustainScreen {
     protected void playNoteSwitch(String notation) {
         if (notes.containsKey(notation)) {
             NotePlayer.stopNote(notes.remove(notation), getMinecraft().player);
-            PoseManager.clearCache(getMinecraft().player);
+            clearPublishedPose();
         } else {
             UUID uuid = UUID.randomUUID();
             int note = MidiUtils.notationToNote(notation);
@@ -33,9 +33,9 @@ public class BrassScreen extends PlaySustainScreen {
             PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
             if (pose != null) {
                 if (instrument.getInstrumentId().equals(YwzjMidi.modLocation("trombone"))) {
-                    PoseManager.publish(getMinecraft().player, pose, instrument, Collections.singletonList(note));
+                    publishPose(pose, instrument, Collections.singletonList(note));
                 } else {
-                    PoseManager.publish(getMinecraft().player, pose);
+                    publishPose(pose);
                 }
             }
             notes.put(notation, uuid);

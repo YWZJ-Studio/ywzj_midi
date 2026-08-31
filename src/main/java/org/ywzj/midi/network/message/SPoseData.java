@@ -22,6 +22,7 @@ public class SPoseData extends CPoseData {
         this.rightArmRotY = cPoseData.rightArmRotY;
         this.rightArmRotZ = cPoseData.rightArmRotZ;
         this.instrumentId = cPoseData.instrumentId;
+        this.instrumentEntityId = cPoseData.instrumentEntityId;
         this.notesLength = cPoseData.notesLength;
         this.notes = cPoseData.notes;
         this.playerUuid = cPoseData.playerUuid;
@@ -47,6 +48,7 @@ public class SPoseData extends CPoseData {
         pose.rightArmRotZ = getValue(this.rightArmRotZ);
         pose.instrumentId = this.instrumentId;
         pose.notes = IntStream.of(this.notes).boxed().collect(Collectors.toList());
+        pose.instrumentEntityId = this.instrumentEntityId;
         return pose;
     }
 

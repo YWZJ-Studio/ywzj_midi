@@ -22,7 +22,7 @@ public class WoodwindScreen extends PlaySustainScreen {
     protected void playNoteSwitch(String notation) {
         if (notes.containsKey(notation)) {
             NotePlayer.stopNote(notes.remove(notation), getMinecraft().player);
-            PoseManager.clearCache(getMinecraft().player);
+            clearPublishedPose();
         } else {
             UUID uuid = UUID.randomUUID();
             int note = MidiUtils.notationToNote(notation);
@@ -30,7 +30,7 @@ public class WoodwindScreen extends PlaySustainScreen {
             var ctx = new MidiPoseScriptContext(note, (int) velocitySlider.value, instrument.getInstrumentId());
             PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
             if (pose != null) {
-                PoseManager.publish(getMinecraft().player, pose);
+                publishPose(pose);
             }
             notes.put(notation, uuid);
         }

@@ -34,7 +34,7 @@ public class ViolMidiReceiver extends MidiReceiver {
                     poseContext.setTick(System.currentTimeMillis());
                     PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
                     if (pose != null) {
-                        PoseManager.publish(player, pose);
+                        publish(pose);
                     }
                 }
             }
@@ -77,7 +77,7 @@ public class ViolMidiReceiver extends MidiReceiver {
                     for (int i = 0; i < 7; i++) {
                         PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, poseContext);
                         if (pose != null) {
-                            PoseManager.publish(player, pose);
+                            publish(pose);
                         }
                     }
                 }
@@ -105,7 +105,7 @@ public class ViolMidiReceiver extends MidiReceiver {
     @Override
     public void stopPose() {
         stopBowLoop();
-        PoseManager.clearCache(player);
+        clearPose();
     }
 
 }

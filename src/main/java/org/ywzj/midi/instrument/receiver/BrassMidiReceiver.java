@@ -36,9 +36,9 @@ public class BrassMidiReceiver extends MidiReceiver {
                     // Trombone's item model consumes note metadata to update
                     // its slide, as in TrombonePlayPose.play(int).
                     if (instrument.getInstrumentId().equals(YwzjMidi.modLocation("trombone"))) {
-                        PoseManager.publish(player, pose, instrument, Collections.singletonList(note));
+                        publish(pose, instrument, Collections.singletonList(note));
                     } else {
-                        PoseManager.publish(player, pose);
+                        publish(pose);
                     }
                 }
             } else if (command == ShortMessage.NOTE_OFF) {
@@ -50,7 +50,7 @@ public class BrassMidiReceiver extends MidiReceiver {
 
     @Override
     public void stopPose() {
-        PoseManager.clearCache(player);
+        clearPose();
     }
 
 }

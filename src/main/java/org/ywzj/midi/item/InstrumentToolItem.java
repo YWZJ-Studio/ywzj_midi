@@ -33,6 +33,16 @@ public class InstrumentToolItem extends Item {
         return itemStack;
     }
 
+    public static boolean matches(ItemStack itemStack, String toolId) {
+        return toolId != null
+                && itemStack.is(AllItems.INSTRUMENT_TOOL_ITEM.get())
+                && toolId.equals(itemStack.getOrCreateTag().getString(TAG_INSTRUMENT_TOOL_ID));
+    }
+
+    public static boolean matches(ItemStack itemStack, Instrument instrument) {
+        return instrument != null && matches(itemStack, instrument.getData().getTool());
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         if (!level.isClientSide) return InteractionResultHolder.pass(player.getItemInHand(interactionHand));

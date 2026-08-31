@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import org.ywzj.midi.all.AllInstruments;
@@ -64,7 +65,7 @@ public class ConductorScreen extends Screen {
         conductor.level().getEntities(conductor,
                 new AABB(conductor.getX()-32.0D, conductor.getY()-32.0D, conductor.getZ()-32.0D, conductor.getX()+32.0D, conductor.getY()+32.0D, conductor.getZ()+32.0D))
                 .stream()
-                .filter(entity -> entity instanceof Player || entity instanceof FakePlayerEntity)
+                .filter(entity -> entity instanceof Player || entity instanceof FakePlayerEntity || entity instanceof TamableAnimal)
                 .forEach(player -> players.add(new SelectionList.Selection(player, player.getName().getString())));
         players.add(new SelectionList.Selection<>(conductor, conductor.getName().getString()));
         midSelections.clear();

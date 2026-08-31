@@ -11,9 +11,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllEntities;
@@ -24,25 +26,26 @@ import org.ywzj.midi.instrument.receiver.MidiReceiver;
 import org.ywzj.midi.item.InstrumentEntityItem;
 import org.ywzj.midi.item.InstrumentItem;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class InstrumentEntity extends Entity {
 
     public static final String TAG_INSTRUMENT_ID = "instrument_id";
     public static final String TAG_DISPLAY_ID = "instrument_display_id";
     public static final String TAG_SWITCHABLE_ON = "switchable_on";
     public static final String TAG_INSTRUMENT_NAME = "instrument_name";
-    private static final EntityDataAccessor<String> DISPLAY_ID =
-            SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<Boolean> SWITCHABLE_ON =
-            SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<String> INSTRUMENT_NAME =
-            SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<String> INSTRUMENT_ID =
-            SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> DISPLAY_ID = SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Boolean> SWITCHABLE_ON = SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<String> INSTRUMENT_NAME = SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> INSTRUMENT_ID = SynchedEntityData.defineId(InstrumentEntity.class, EntityDataSerializers.STRING);
+    private static final double PUSH_STRENGTH = 0.01D;
+    private static final double HORIZONTAL_FRICTION = 0.5D;
     private MidiReceiver receiver;
+    private Set<Integer> activeNotes = Collections.emptySet();
 
     public InstrumentEntity(EntityType<? extends InstrumentEntity> type, Level level) {
         super(type, level);
-        this.noPhysics = true;
         this.noCulling = true;
     }
 
@@ -104,21 +107,7 @@ public class InstrumentEntity extends Entity {
         }
         if (player.isShiftKeyDown()) {
             if (!this.level().isClientSide) {
-                ResourceLocation id = getInstrumentId();
-                var instrument = id == null ? null : AllInstruments.fromId(id);
-                if (instrument != null) {
-                    if ("entity".equals(instrument.getData().getItemType())) {
-                        this.spawnAtLocation(InstrumentEntityItem.createInstance(id, instrument.getData().getName()));
-                    } else if ("item".equals(instrument.getData().getItemType())) {
-                        this.spawnAtLocation(InstrumentItem.createInstance(id, instrument.getData().getName()));
-                    } else {
-                        var itemSupplier = AllItems.ITEMS_LOOKUP.get(id.getPath());
-                        if (itemSupplier != null && itemSupplier.get() != null) {
-                            this.spawnAtLocation(new ItemStack(itemSupplier.get()));
-                        }
-                    }
-                }
-                this.discard();
+                dropAsItem();
             }
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
@@ -131,6 +120,27 @@ public class InstrumentEntity extends Entity {
             setSwitchableOn(!isSwitchableOn());
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    public void dropAsItem() {
+        if (this.level().isClientSide) {
+            return;
+        }
+        ResourceLocation instrumentId = getInstrumentId();
+        var instrument = instrumentId == null ? null : AllInstruments.fromId(instrumentId);
+        if (instrument != null) {
+            if ("entity".equals(instrument.getData().getItemType())) {
+                this.spawnAtLocation(InstrumentEntityItem.createInstance(instrumentId, instrument.getData().getName()));
+            } else if ("item".equals(instrument.getData().getItemType())) {
+                this.spawnAtLocation(InstrumentItem.createInstance(instrumentId, instrument.getData().getName()));
+            } else {
+                var itemSupplier = AllItems.ITEMS_LOOKUP.get(instrumentId.getPath());
+                if (itemSupplier != null && itemSupplier.get() != null) {
+                    this.spawnAtLocation(new ItemStack(itemSupplier.get()));
+                }
+            }
+        }
+        this.discard();
     }
 
     @Override
@@ -177,6 +187,12 @@ public class InstrumentEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (!this.isNoGravity()) {
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -0.04D, 0.0D));
+        }
+        this.move(MoverType.SELF, this.getDeltaMovement());
+        Vec3 movement = this.getDeltaMovement();
+        this.setDeltaMovement(movement.x * HORIZONTAL_FRICTION, movement.y * 0.98D, movement.z * HORIZONTAL_FRICTION);
     }
 
     @Override
@@ -194,12 +210,37 @@ public class InstrumentEntity extends Entity {
         return true;
     }
 
+    @Override
+    public void push(Entity entity) {
+        if (!this.isPushable() || entity.isRemoved() || !entity.isPushable()) {
+            return;
+        }
+        double xDifference = this.getX() - entity.getX();
+        double zDifference = this.getZ() - entity.getZ();
+        double distance = Math.sqrt(xDifference * xDifference + zDifference * zDifference);
+        if (distance < 1.0E-7D) {
+            return;
+        }
+        double push = PUSH_STRENGTH / distance;
+        this.setDeltaMovement(this.getDeltaMovement().add(xDifference * push, 0.0D, zDifference * push));
+        this.hasImpulse = true;
+    }
+
     public void setReceiver(MidiReceiver receiver) {
         this.receiver = receiver;
+        if (receiver != null) receiver.setInstrumentEntityId(getId());
     }
 
     public MidiReceiver getReceiver() {
         return receiver;
+    }
+
+    public Set<Integer> getActiveNotes() {
+        return activeNotes;
+    }
+
+    public void setActiveNotes(java.util.List<Integer> notes) {
+        activeNotes = notes == null || notes.isEmpty() ? Collections.emptySet() : Set.copyOf(notes);
     }
 
 }

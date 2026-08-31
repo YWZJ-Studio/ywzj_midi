@@ -17,9 +17,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllInstruments;
-import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.audio.NotePlayer;
 import org.ywzj.midi.blockentity.TimpaniBlockEntity;
+import org.ywzj.midi.item.InstrumentToolItem;
 import org.ywzj.midi.pose.action.BassDrumPlayPose;
 
 import java.util.UUID;
@@ -39,12 +39,13 @@ public class BassDrumBlock extends HorizontalBlock implements EntityBlock {
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
         if (world.isClientSide && hand.equals(InteractionHand.MAIN_HAND)) {
-            if (player.getItemInHand(hand).is(AllItems.FELT_MALLET.get())) {
+            var bassDrum = AllInstruments.fromId(YwzjMidi.modLocation("bass_drum"));
+            if (InstrumentToolItem.matches(player.getItemInHand(hand), bassDrum)) {
                 if (bassDrumPlayPose == null) {
                     bassDrumPlayPose = new BassDrumPlayPose(player);
                 }
                 bassDrumPlayPose.hit();
-                NotePlayer.playNote(UUID.randomUUID(), new Vec3(pos.getX(), pos.getY(), pos.getZ()), AllInstruments.fromId(YwzjMidi.modLocation("bass_drum")), 0, 36, 127, 0, player);
+                NotePlayer.playNote(UUID.randomUUID(), new Vec3(pos.getX(), pos.getY(), pos.getZ()), bassDrum, 0, 36, 127, 0, player);
             }
         }
         return InteractionResult.PASS;

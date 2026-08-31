@@ -30,6 +30,7 @@ public class ScreenManager {
 
     private static final ConductorScreen CONDUCTOR_SCREEN = new ConductorScreen(ComponentUtils.literal("指挥"));
     private static final HashMap<String, MidiInstrumentScreen> instrumentScreens = new HashMap<>();
+    private static final HashMap<UUID, MidiInstrumentScreen> entityInstrumentScreens = new HashMap<>();
     private static final HashMap<UUID, ServerMidiScreen> fakePlayerConductorScreens = new HashMap<>();
 
     public static void openBatonScreen() {
@@ -70,16 +71,16 @@ public class ScreenManager {
      * Open screen for an entity-based instrument (piano, timpani, bass drum, etc. placed in world).
      */
     public static void openInstrumentEntityScreen(Instrument instrument, InstrumentEntity entity) {
-        String name = instrument.getName();
-        MidiInstrumentScreen screen = instrumentScreens.get(name);
+        MidiInstrumentScreen screen = entityInstrumentScreens.get(entity.getUUID());
         if (screen == null) {
             screen = createEntityScreen(instrument, entity);
             if (screen != null) {
-                instrumentScreens.put(name, screen);
-                entity.setReceiver(screen.receiver);
+                entityInstrumentScreens.put(entity.getUUID(), screen);
             }
         }
         if (screen != null) {
+            entity.setReceiver(screen.receiver);
+            screen.instrumentEntityId = entity.getId();
             final MidiInstrumentScreen finalScreen = screen;
             finalScreen.pos = entity.position();
             Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(finalScreen));

@@ -102,10 +102,10 @@ public class InstrumentEntityRenderer extends EntityRenderer<InstrumentEntity> {
     @Nullable
     private static Pose createScriptPose(BedrockModel model, InstrumentEntity entity) {
         MidiReceiver receiver = entity.getReceiver();
-        if (receiver == null) {
-            return null;
+        Set<Integer> notes = receiver == null ? Set.of() : receiver.getPlayedNotes();
+        if (notes.isEmpty()) {
+            notes = entity.getActiveNotes();
         }
-        Set<Integer> notes = receiver.getPlayedNotes();
         if (notes.isEmpty()) {
             return null;
         }

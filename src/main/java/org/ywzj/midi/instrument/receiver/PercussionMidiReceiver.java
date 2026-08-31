@@ -84,12 +84,10 @@ public class PercussionMidiReceiver extends MidiReceiver {
             PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
             if (pose != null) {
                 if (i == frameCount - 1 && percussionMode != 2) {
-                    // The final frame carries the same metadata as the
-                    // hardcoded implementations: it drives look-at handlers.
                     int handlerNote = percussionMode == 1 ? 0 : note;
-                    PoseManager.publish(player, pose, instrument, Collections.singletonList(handlerNote));
+                    publish(pose, instrument, Collections.singletonList(handlerNote));
                 } else {
-                    PoseManager.publish(player, pose);
+                    publish(pose);
                 }
             }
         }
@@ -105,4 +103,5 @@ public class PercussionMidiReceiver extends MidiReceiver {
             default -> 36;
         };
     }
+
 }
