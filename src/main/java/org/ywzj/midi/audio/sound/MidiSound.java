@@ -7,6 +7,7 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
+import org.ywzj.midi.all.AllConfigs;
 
 public class MidiSound extends SimpleSoundInstance implements TickableSoundInstance {
 
@@ -80,7 +81,8 @@ public class MidiSound extends SimpleSoundInstance implements TickableSoundInsta
     }
 
     private void updateRelativePos() {
-        Vec3 simulatedPos = calRelativePos(notePos, 0.33d);
+        double distanceMultiplier = AllConfigs.common.soundDistanceMultiplier.get();
+        Vec3 simulatedPos = calRelativePos(notePos, 1.0d / distanceMultiplier);
         this.x = simulatedPos.x;
         this.y = simulatedPos.y;
         this.z = simulatedPos.z;

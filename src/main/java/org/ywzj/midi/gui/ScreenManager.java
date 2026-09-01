@@ -45,7 +45,7 @@ public class ScreenManager {
         if (pianoBlockEntity.clavichordScreen == null) {
             pianoBlockEntity.clavichordScreen = new ClavichordScreen(instrument, pos, ComponentUtils.literal("钢琴"), "c4", "b6");
         }
-        Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(pianoBlockEntity.clavichordScreen));
+        openMidiInstrumentScreen(pianoBlockEntity.clavichordScreen);
     }
 
     /**
@@ -62,8 +62,7 @@ public class ScreenManager {
             }
         }
         if (screen != null) {
-            final Screen finalScreen = screen;
-            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(finalScreen));
+            openMidiInstrumentScreen(screen);
         }
     }
 
@@ -81,10 +80,17 @@ public class ScreenManager {
         if (screen != null) {
             entity.setReceiver(screen.receiver);
             screen.instrumentEntityId = entity.getId();
-            final MidiInstrumentScreen finalScreen = screen;
-            finalScreen.pos = entity.position();
-            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(finalScreen));
+            screen.pos = entity.position();
+            openMidiInstrumentScreen(screen);
         }
+    }
+
+    private static void openMidiInstrumentScreen(MidiInstrumentScreen screen) {
+        Minecraft.getInstance().tell(() -> {
+            if (screen.canOpen()) {
+                Minecraft.getInstance().setScreen(screen);
+            }
+        });
     }
 
     private static MidiInstrumentScreen createEntityScreen(Instrument instrument, InstrumentEntity entity) {

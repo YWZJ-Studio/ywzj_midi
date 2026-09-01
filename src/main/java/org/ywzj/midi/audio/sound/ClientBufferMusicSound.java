@@ -16,26 +16,16 @@ import java.util.concurrent.CompletableFuture;
 public class ClientBufferMusicSound extends MusicSound {
 
     private final ClientBufferStream stream;
-    public Vec3 playPos;
 
     public ClientBufferMusicSound(SoundEvent event, float volume, float pitch, RandomSource source, Vec3 pos, float sampleRate, float frameRate, String musicName) {
         super(event, volume, pitch, source, pos);
-        this.playPos = pos;
         this.stream = new ClientBufferStream(this, sampleRate, frameRate);
         Minecraft.getInstance().gui.setNowPlaying(ComponentUtils.literal(musicName));
     }
 
     public void updatePosAndStream(Vec3 pos, byte[] bytes) {
-        playPos = pos;
+        updatePos(pos);
         stream.writeBytes(bytes);
-    }
-
-    @Override
-    public void tick() {
-        this.x = playPos.x;
-        this.y = playPos.y;
-        this.z = playPos.z;
-        super.tick();
     }
 
     @Override

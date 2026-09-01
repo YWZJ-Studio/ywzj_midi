@@ -24,13 +24,11 @@ public class ClientSyncMusicSound extends MusicSound {
     public AudioStream stream;
     public final URL url;
     public final String musicName;
-    public Vec3 playPos;
     public final UUID soundUuid;
     public final UUID deviceUuid;
 
     public ClientSyncMusicSound(SoundEvent event, float volume, float pitch, RandomSource source, Vec3 pos, URL url, String musicName, ClientPlayerInstance playerInstance) {
         super(event, volume, pitch, source, pos);
-        this.playPos = pos;
         this.playerInstance = playerInstance;
         this.url = url;
         this.musicName = musicName;
@@ -49,18 +47,6 @@ public class ClientSyncMusicSound extends MusicSound {
     public void stopThis() {
         super.stop();
         Channel.CHANNEL.sendToServer(new CSyncMusic(soundUuid));
-    }
-
-    public void updatePos(Vec3 pos) {
-        playPos = pos;
-    }
-
-    @Override
-    public void tick() {
-        this.x = playPos.x;
-        this.y = playPos.y;
-        this.z = playPos.z;
-        super.tick();
     }
 
     @Override

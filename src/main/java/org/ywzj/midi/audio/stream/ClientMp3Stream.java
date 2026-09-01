@@ -86,7 +86,7 @@ public class ClientMp3Stream implements AudioStream {
         ItemStack itemCarried = Minecraft.getInstance().player.inventoryMenu.getCarried();
         boolean isDeviceCarried = itemCarried.getItem().equals(AllItems.MUSIC_PLAYER.get())
                 && Objects.equals(MusicPlayerItem.getUUID(itemCarried), soundInstance.deviceUuid);
-        Channel.CHANNEL.sendToServer(new CPlayMusic(soundInstance.playPos,
+        Channel.CHANNEL.sendToServer(new CPlayMusic(soundInstance.getPlayPos(),
                 readOffset,
                 soundInstance.url.toString(),
                 soundInstance.musicName,

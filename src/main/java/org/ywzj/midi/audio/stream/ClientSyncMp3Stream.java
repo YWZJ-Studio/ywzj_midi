@@ -93,7 +93,7 @@ public class ClientSyncMp3Stream implements AudioStream {
                     boolean isDeviceCarried = itemCarried.getItem().equals(AllItems.MUSIC_PLAYER.get())
                             && Objects.equals(MusicPlayerItem.getUUID(itemCarried), soundInstance.deviceUuid);
                     byte[] bytes = Arrays.copyOfRange(sendBuffer.toByteArray(), sendOffset, sendOffset + size);
-                    Channel.CHANNEL.sendToServer(new CSyncMusic(soundInstance.playPos,
+                    Channel.CHANNEL.sendToServer(new CSyncMusic(soundInstance.getPlayPos(),
                             stream.getFormat().getSampleRate(),
                             stream.getFormat().getFrameRate(),
                             soundInstance.musicName,

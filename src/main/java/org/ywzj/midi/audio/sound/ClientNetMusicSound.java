@@ -24,7 +24,6 @@ public class ClientNetMusicSound extends MusicSound {
     public AudioStream stream;
     public final URL url;
     public final String musicName;
-    public Vec3 playPos;
     public final int readOffset;
     public final boolean isHost;
     public final UUID soundUuid;
@@ -32,7 +31,6 @@ public class ClientNetMusicSound extends MusicSound {
 
     public ClientNetMusicSound(SoundEvent event, float volume, float pitch, RandomSource source, Vec3 pos, URL url, String musicName, int readOffset, boolean isHost, ClientPlayerInstance playerInstance) {
         super(event, volume, pitch, source, pos);
-        this.playPos = pos;
         this.playerInstance = playerInstance;
         this.url = url;
         this.musicName = musicName;
@@ -47,18 +45,6 @@ public class ClientNetMusicSound extends MusicSound {
             super.stop();
         }
         Minecraft.getInstance().gui.setNowPlaying(ComponentUtils.literal(musicName));
-    }
-
-    public void updatePos(Vec3 pos) {
-        playPos = pos;
-    }
-
-    @Override
-    public void tick() {
-        this.x = playPos.x;
-        this.y = playPos.y;
-        this.z = playPos.z;
-        super.tick();
     }
 
     @Override

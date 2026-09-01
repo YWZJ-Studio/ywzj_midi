@@ -20,10 +20,13 @@ public class AllConfigs {
     public static class CommonConfig {
 
         public final ForgeConfigSpec.ConfigValue<Integer> maxSyncMusicTo;
+        public final ForgeConfigSpec.DoubleValue soundDistanceMultiplier;
 
         public CommonConfig(ForgeConfigSpec.Builder builder) {
             maxSyncMusicTo = builder.comment("The maximum number of players one can share local music with.")
                     .define("max_sync_music_to", 3);
+            soundDistanceMultiplier = builder.comment("Multiplier for the audible distance of instrument and music sounds.")
+                    .defineInRange("sound_distance_multiplier", 3.0d, 0.1d, 100.0d);
         }
 
     }

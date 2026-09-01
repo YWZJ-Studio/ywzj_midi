@@ -102,22 +102,19 @@ public class InstrumentEntity extends Entity {
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
-        if (hand != InteractionHand.MAIN_HAND) {
-            return InteractionResult.PASS;
-        }
         if (player.isShiftKeyDown()) {
             if (!this.level().isClientSide) {
-                dropAsItem();
+                if (hand == InteractionHand.OFF_HAND) {
+                    dropAsItem();
+                } else if (hand == InteractionHand.MAIN_HAND) {
+                    setSwitchableOn(!isSwitchableOn());
+                }
             }
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
-        }
-        if (this.level().isClientSide) {
+        } else if (this.level().isClientSide) {
             var instrument = AllInstruments.fromId(getInstrumentId());
             if (instrument != null) {
                 ScreenManager.openInstrumentEntityScreen(instrument, this);
             }
-        } else {
-            setSwitchableOn(!isSwitchableOn());
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
     }

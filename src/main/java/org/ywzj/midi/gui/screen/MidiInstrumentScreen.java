@@ -190,15 +190,18 @@ public abstract class MidiInstrumentScreen extends Screen {
 
     @Override
     public void tick() {
+        if (!canOpen()) {
+            this.onClose();
+        }
+    }
+
+    public boolean canOpen() {
         if (instrument.isPortable()) {
-            return;
+            return true;
         }
         Player player = Minecraft.getInstance().player;
-        if (player != null) {
-            if (!player.isAlive() || MathUtils.distance(player.getX(), player.getY(), player.getZ(), pos.x, pos.y, pos.z) > 3) {
-                this.onClose();
-            }
-        }
+        return player != null && player.isAlive()
+                && MathUtils.distance(player.getX(), player.getY(), player.getZ(), pos.x, pos.y, pos.z) <= 3;
     }
 
 }
