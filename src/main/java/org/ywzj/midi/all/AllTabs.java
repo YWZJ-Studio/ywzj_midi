@@ -11,7 +11,6 @@ import net.minecraftforge.registries.RegistryObject;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.client.resource.ClientAssetsManager;
 import org.ywzj.midi.instrument.Instrument;
-import org.ywzj.midi.item.InstrumentItem;
 import org.ywzj.midi.resource.InstrumentPackLoader;
 import org.ywzj.midi.util.ComponentUtils;
 
@@ -38,10 +37,7 @@ public class AllTabs {
     public static void register(IEventBus eventBus) {
         InstrumentPackLoader.INSTANCE.getInstrumentPacks().forEach(instrumentPack -> {
             String namespace = instrumentPack.meta().getNamespace();
-            Supplier<ItemStack> icon = YwzjMidi.MOD_ID.equals(namespace)
-                    ? () -> InstrumentItem.createInstance(YwzjMidi.modLocation("d274"), ComponentUtils.literal("D-274"))
-                    : () -> AllItems.PLAIN_TEXTURE_ITEM.get().createInstance(
-                            YwzjMidi.resourceLocation(namespace, "textures/tab.png"));
+            Supplier<ItemStack> icon = () -> AllItems.PLAIN_TEXTURE_ITEM.get().createInstance(YwzjMidi.resourceLocation(namespace, "pack.png"));
             addInstrumentTab("tab_" + namespace, Component.translatable(instrumentPack.meta().getTitle()), icon, namespace);
         });
         TABS.register(eventBus);

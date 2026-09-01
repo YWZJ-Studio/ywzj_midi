@@ -93,6 +93,10 @@ repositories {
             includeGroup "com.github.mcmodderanchor"
         }
     }
+    maven {
+        name = "Jared's maven"
+        url = 'https://maven.blamejared.com/'
+    }
 }
 
 dependencies {
@@ -121,6 +125,10 @@ dependencies {
         exclude group: 'it.unimi.dsi', module: 'fastutil'
         exclude group: 'org.joml', module: 'joml'
     }
+    // JEI
+    implementation fg.deobf("mezz.jei:jei-1.20.1-common-api:15.20.0.104")
+    implementation fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.20.0.104")
+    runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.104')
     // 兼容性测试
 //    implementation fg.deobf("local:sound-physics-remastered-forge:1.20.1-1.5.1")
     if (!project.gradle.startParameter.taskNames.any { it.contains("runServer") }) {

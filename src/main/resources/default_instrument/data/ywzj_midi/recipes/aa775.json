@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" A ", "AIG", " A "],
+  "key": {
+    "A": {"item": "minecraft:amethyst_shard"},
+    "I": {"item": "minecraft:iron_ingot"},
+    "G": {"item": "minecraft:copper_ingot"}
+  },
+  "result": {
+    "item": "ywzj_midi:instrument_entity_item",
+    "count": 1,
+    "nbt": "{instrument_id:\"ywzj_midi:aa775\"}"
+  }
+}

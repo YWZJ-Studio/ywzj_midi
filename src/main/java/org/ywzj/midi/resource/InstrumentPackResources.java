@@ -39,6 +39,14 @@ public class InstrumentPackResources extends PathPackResources {
 
     @Override
     public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
+        if (type == PackType.CLIENT_RESOURCES
+                && instrumentPack.meta().getNamespace().equals(location.getNamespace())
+                && "pack.png".equals(location.getPath())) {
+            IoSupplier<InputStream> packIcon = getRootResource("pack.png");
+            if (packIcon != null) {
+                return packIcon;
+            }
+        }
         if (type == PackType.CLIENT_RESOURCES && SoundFileHelper.isVirtualSoundsJson(location)) {
             byte[] bytes = virtualSoundsJson.get(location.getNamespace());
             if (bytes != null) {

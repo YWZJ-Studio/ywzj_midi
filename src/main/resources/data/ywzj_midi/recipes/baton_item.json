@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" F ", " G ", " K "],
+  "key": {
+    "F": {"item": "minecraft:feather"},
+    "G": {"item": "minecraft:gold_nugget"},
+    "K": {"item": "minecraft:stick"}
+  },
+  "result": {
+    "item": "ywzj_midi:baton_item",
+    "count": 1
+  }
+}
