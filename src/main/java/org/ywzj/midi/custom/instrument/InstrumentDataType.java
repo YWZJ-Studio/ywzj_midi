@@ -52,4 +52,5 @@ public record InstrumentDataType<T extends BaseInstrumentData>(
             return new InstrumentDataType<>(id, dataSerializer);
         }
     }
+
 }

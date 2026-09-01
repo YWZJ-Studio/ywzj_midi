@@ -105,4 +105,5 @@ public class InstrumentModelManager extends SimplePreparableReloadListener<Map<R
     public static void fromNetwork(Map<ResourceLocation, String> map) {
         ClientCache.INSTANCE.fromNetwork(map);
     }
+
 }

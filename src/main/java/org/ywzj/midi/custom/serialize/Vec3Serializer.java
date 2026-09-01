@@ -29,4 +29,5 @@ public class Vec3Serializer implements JsonDeserializer<Vec3>, JsonSerializer<Ve
         array.set(2, new JsonPrimitive(src.z()));
         return array;
     }
+
 }

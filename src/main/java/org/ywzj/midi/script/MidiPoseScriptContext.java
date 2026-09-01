@@ -119,4 +119,5 @@ public class MidiPoseScriptContext {
     public void resetState() {
         state.clear();
     }
+
 }

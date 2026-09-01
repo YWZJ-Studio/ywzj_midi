@@ -60,4 +60,5 @@ public class BaseInstrumentDataPojo {
         @SerializedName("key_end")
         public String keyEnd = "c5";
     }
+
 }

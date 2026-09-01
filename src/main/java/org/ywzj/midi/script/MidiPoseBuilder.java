@@ -101,4 +101,5 @@ public class MidiPoseBuilder {
             rightArmRotX, rightArmRotY, rightArmRotZ
         );
     }
+
 }

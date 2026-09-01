@@ -60,4 +60,5 @@ public class MidiScriptManager extends SimplePreparableReloadListener<Map<Resour
     public Optional<Script> getScript(ResourceLocation resourcelocation) {
         return Optional.ofNullable(scripts.get(resourcelocation));
     }
+
 }

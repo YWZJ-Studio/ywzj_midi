@@ -37,7 +37,7 @@ public class AllTabs {
     public static void register(IEventBus eventBus) {
         InstrumentPackLoader.INSTANCE.getInstrumentPacks().forEach(instrumentPack -> {
             String namespace = instrumentPack.meta().getNamespace();
-            Supplier<ItemStack> icon = () -> AllItems.PLAIN_TEXTURE_ITEM.get().createInstance(YwzjMidi.resourceLocation(namespace, "pack.png"));
+            Supplier<ItemStack> icon = () -> AllItems.PLAIN_TEXTURE_ITEM.get().createInstance(YwzjMidi.resourceLocation(namespace, "textures/tab.png"));
             addInstrumentTab("tab_" + namespace, Component.translatable(instrumentPack.meta().getTitle()), icon, namespace);
         });
         TABS.register(eventBus);
