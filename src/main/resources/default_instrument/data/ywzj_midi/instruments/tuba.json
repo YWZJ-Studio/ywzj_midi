@@ -9,6 +9,5 @@
   "item_type": "item",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "gs0", "key_end": "e4"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/tuba"
+  ]
 }

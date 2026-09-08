@@ -13,6 +13,5 @@
   "variants": [
     {"name": "raw", "loop": true, "key_start": "c2", "key_end": "g5"},
     {"name": "pizz", "loop": false, "key_start": "c2", "key_end": "cs5"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/cello"
+  ]
 }

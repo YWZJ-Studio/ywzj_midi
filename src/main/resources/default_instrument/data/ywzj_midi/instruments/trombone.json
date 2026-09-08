@@ -10,6 +10,5 @@
   "play_hand": "off_hand",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "c1", "key_end": "e5"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/trombone"
+  ]
 }

@@ -9,6 +9,5 @@
   "item_type": "item",
   "variants": [
     {"name": "raw", "loop": true, "key_start": "c4", "key_end": "ds6"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/oboe"
+  ]
 }

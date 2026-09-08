@@ -13,6 +13,5 @@
   "variants": [
     {"name": "raw", "loop": true, "key_start": "c3", "key_end": "f6"},
     {"name": "pizz", "loop": false, "key_start": "c3", "key_end": "f6"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/viola"
+  ]
 }

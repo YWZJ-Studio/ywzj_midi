@@ -6,9 +6,8 @@
   "key_start": "n",
   "key_end": "n",
   "family": "special",
-  "item_type": "entity",
+  "item_type": "block",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "n", "key_end": "n"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/aa775"
+  ]
 }

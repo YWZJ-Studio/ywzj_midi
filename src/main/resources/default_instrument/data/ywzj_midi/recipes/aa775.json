@@ -7,8 +7,7 @@
     "G": {"item": "minecraft:copper_ingot"}
   },
   "result": {
-    "item": "ywzj_midi:instrument_entity_item",
-    "count": 1,
-    "nbt": "{instrument_id:\"ywzj_midi:aa775\"}"
+    "item": "ywzj_midi:aa775",
+    "count": 1
   }
 }

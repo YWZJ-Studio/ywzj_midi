@@ -62,6 +62,16 @@ public class AllInstrumentDataTypes {
             }
     );
 
+    public static final InstrumentDataType<PluckedInstrumentData> PLUCKED = register(
+            "plucked",
+            json -> {
+                var pojo = GsonUtil.GSON.fromJson(json, BaseInstrumentDataPojo.class);
+                var data = new PluckedInstrumentData();
+                data.build(pojo);
+                return data;
+            }
+    );
+
     private static <T extends BaseInstrumentData> InstrumentDataType<T> register(String name, InstrumentDataType.DataSerializer<T> dataSerializer) {
         var dataType = InstrumentDataType.Builder.<T>of(YwzjMidi.modLocation(name))
                 .setDataSerializer(dataSerializer)

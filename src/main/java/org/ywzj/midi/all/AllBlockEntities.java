@@ -19,7 +19,9 @@ public class AllBlockEntities {
                     BlockEntityType.Builder.of(NoteBlockEntity::new,
                             AllBlocks.SPEAKER_BLOCK.get(),
                             AllBlocks.BASS_DRUM_BLOCK.get(),
-                            AllBlocks.TIMPANI_BLOCK.get()).build(null));
+                            AllBlocks.TIMPANI_BLOCK.get(),
+                            AllBlocks.AA775_BLOCK.get(),
+                            AllBlocks.U1H_BLOCK.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<SpeakerBlockEntity>> SPEAKER_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("speaker_block_entity", () ->

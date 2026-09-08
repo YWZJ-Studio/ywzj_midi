@@ -9,6 +9,5 @@
   "item_type": "item",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "c2", "key_end": "g5"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/horn"
+  ]
 }

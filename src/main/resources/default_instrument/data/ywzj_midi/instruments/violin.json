@@ -13,6 +13,5 @@
   "variants": [
     {"name": "raw", "loop": true, "key_start": "g3", "key_end": "e7"},
     {"name": "pizz", "loop": false, "key_start": "g3", "key_end": "e7"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/violin"
+  ]
 }

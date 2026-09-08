@@ -13,6 +13,5 @@
   "variants": [
     {"name": "raw", "loop": true, "key_start": "c1", "key_end": "cs4"},
     {"name": "pizz", "loop": false, "key_start": "c1", "key_end": "cs4"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/double_bass"
+  ]
 }

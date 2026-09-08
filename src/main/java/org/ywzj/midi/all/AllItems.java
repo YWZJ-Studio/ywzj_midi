@@ -25,7 +25,6 @@ public class AllItems {
     public static final RegistryObject<PlainTextureItem> PLAIN_TEXTURE_ITEM = registerItem("plain_texture_item", () -> new PlainTextureItem(new Item.Properties().stacksTo(1)), false);
     // 仅用于读取java模型
     public static final RegistryObject<Item> VIOLIN = registerItem("violin", () -> new Item(new Item.Properties().stacksTo(1)), false);
-    public static final RegistryObject<Item> U1H = registerItem("u1h", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> CFX = registerItem("cfx", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> VIOLA = registerItem("viola", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> CELLO = registerItem("cello", () -> new Item(new Item.Properties().stacksTo(1)), false);
@@ -44,7 +43,6 @@ public class AllItems {
     public static final RegistryObject<Item> CELLO_BOW = registerItem("cello_bow", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> DOUBLE_BASS_BOW = registerItem("double_bass_bow", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> FELT_MALLET = registerItem("felt_mallet_item", () -> new Item(new Item.Properties().stacksTo(1)), false);
-    public static final RegistryObject<Item> AA775 = registerItem("aa775", () -> new Item(new Item.Properties().stacksTo(1)), false);
 
     public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item, boolean tab) {
         return registerItem(YwzjMidi.MOD_ID, name, item, tab);

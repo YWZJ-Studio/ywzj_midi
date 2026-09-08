@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": {"model": "ywzj_midi:block/aa775"}
+    "facing=north": {"model": "ywzj_midi:block/aa775"},
+    "facing=south": {"model": "ywzj_midi:block/aa775", "y": 180},
+    "facing=west": {"model": "ywzj_midi:block/aa775", "y": 270},
+    "facing=east": {"model": "ywzj_midi:block/aa775", "y": 90}
   }
 }

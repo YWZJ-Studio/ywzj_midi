@@ -7,10 +7,7 @@
   "key_end": "c2",
   "family": "percussion",
   "item_type": "block",
-  "tool": "felt_mallet_item",
-  "tool_hand": "main_hand",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "f1", "key_end": "c2"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/bass_drum"
+  ]
 }

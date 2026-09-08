@@ -131,6 +131,8 @@ public class ScreenManager {
                 new WoodwindScreen(instrument, pos, displayName, kbStart, kbEnd);
             case BRASS ->
                 new BrassScreen(instrument, pos, displayName, kbStart, kbEnd);
+            case PLUCKED ->
+                new PluckedScreen(instrument, pos, displayName, kbStart, kbEnd);
             default -> null;
         };
     }

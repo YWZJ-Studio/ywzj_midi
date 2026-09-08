@@ -10,6 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.block.*;
+import org.ywzj.midi.block.piano.U1HBlock;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -23,6 +24,8 @@ public class AllBlocks {
     public static final RegistryObject<Block> SPEAKER_BLOCK = registerBlock("speaker_block", () -> new SpeakerBlock(BlockBehaviour.Properties.of().strength(1f)), true);
     public static final RegistryObject<Block> BASS_DRUM_BLOCK = registerBlock("bass_drum", () -> new BassDrumBlock(BlockBehaviour.Properties.of().strength(1f)), false);
     public static final RegistryObject<Block> TIMPANI_BLOCK = registerBlock("timpani", () -> new TimpaniBlock(BlockBehaviour.Properties.of().strength(1f)), false);
+    public static final RegistryObject<Block> AA775_BLOCK = registerBlock("aa775", () -> new AABlock(BlockBehaviour.Properties.of().strength(1f)), false);
+    public static final RegistryObject<Block> U1H_BLOCK = registerBlock("u1h", () -> new U1HBlock(BlockBehaviour.Properties.of().strength(1f)), false);
 
     public static <T extends Block> RegistryObject<Block> registerBlock(String name, Supplier<T> block) {
         return registerBlock(name, block, true);

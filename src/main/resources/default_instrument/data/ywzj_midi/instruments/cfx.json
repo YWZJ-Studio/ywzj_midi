@@ -14,6 +14,5 @@
       "key_start": "a1",
       "key_end": "c8"
     }
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/piano"
+  ]
 }

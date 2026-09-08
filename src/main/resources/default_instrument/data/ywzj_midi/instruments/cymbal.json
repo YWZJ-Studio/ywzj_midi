@@ -9,6 +9,5 @@
   "item_type": "item",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "c1", "key_end": "c1"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/cymbal"
+  ]
 }

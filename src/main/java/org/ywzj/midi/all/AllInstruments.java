@@ -96,6 +96,7 @@ public class AllInstruments {
         WOODWIND,
         BRASS,
         PERCUSSION,
+        PLUCKED,
         SPECIAL
     }
 

@@ -6,9 +6,8 @@
   "key_start": "a1",
   "key_end": "c8",
   "family": "keyboard",
-  "item_type": "entity",
+  "item_type": "block",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "a1", "key_end": "c8"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/piano"
+  ]
 }

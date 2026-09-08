@@ -9,6 +9,5 @@
   "item_type": "item",
   "variants": [
     {"name": "raw", "loop": false, "key_start": "c3", "key_end": "e6"}
-  ],
-  "structure_model": "ywzj_midi:models/bedrock/instrument/trumpet"
+  ]
 }
