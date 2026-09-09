@@ -120,6 +120,13 @@ public class ScreenManager {
         } else {
             kbStart = "c0"; kbEnd = "b2";
         }
+        int highNote = MidiUtils.notationToNote(instrument.getKeyEnd());
+        int kbStartNote = MidiUtils.notationToNote(kbStart);
+        if (highNote < kbStartNote || lowNote > MidiUtils.notationToNote(kbEnd)) {
+            int anchoredStart = Math.max(12, lowNote - Math.floorMod(lowNote, 12));
+            kbStart = MidiUtils.noteToNotation(anchoredStart);
+            kbEnd = MidiUtils.noteToNotation(anchoredStart + 23);
+        }
 
         var displayName = ComponentUtils.literal(instrument.getName());
         return switch (family) {

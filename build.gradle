@@ -1,10 +1,13 @@
 plugins {
     id 'eclipse'
     id 'idea'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.91'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
 }
 
 version = mod_version
@@ -16,81 +19,88 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+legacyForge {
+    version = project.minecraft_version + '-' + project.forge_version
 
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
 
     runs {
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
         client {
+            client()
+            gameDirectory = project.file('run/client_1')
             // 使用 JetBrainsRuntime 时需要的参数，否则无法热重载
             // 如果你使用别的 JDK，那么可以删除这一行
-            workingDirectory project.file('run/client_1')
-            jvmArgs "-XX:+AllowEnhancedClassRedefinition"
-            jvmArgs "-Xmx4g"
-            property 'forge.enabledGameTestNamespaces', mod_id
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            jvmArgument '-XX:+AllowEnhancedClassRedefinition'
+            jvmArgument '-Xmx4g'
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         client2 {
-            parent minecraft.runs.client
-            args '--username', 'Ranpoes'
-            workingDirectory project.file('run/client_2')
-            property 'forge.enabledGameTestNamespaces', mod_id
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            client()
+            gameDirectory = project.file('run/client_2')
+            programArgument '--username'
+            programArgument 'Ranpoes'
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
+            server()
+            gameDirectory = project.file('run')
+            programArgument '--nogui'
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            type = 'gameTestServer'
+            gameDirectory = project.file('run')
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
-            workingDirectory project.file('run-data')
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            data()
+            gameDirectory = project.file('run-data')
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
         }
     }
 
-    jarJar.enable()
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenCentral()
     flatDir {
         dir 'libs'
     }
     maven {
-        url "https://cursemaven.com"
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+    maven {
+        url 'https://cursemaven.com'
         content {
-            includeGroup "curse.maven"
+            includeGroup 'curse.maven'
         }
     }
     maven {
-        url = "https://api.modrinth.com/maven"
+        url = 'https://api.modrinth.com/maven'
     }
     maven {
-        url 'https://jitpack.io'
+        url = 'https://jitpack.io'
         content {
-            includeGroup "com.github.mcmodderanchor"
+            includeGroup 'com.github.mcmodderanchor'
         }
     }
     maven {
@@ -99,59 +109,94 @@ repositories {
     }
 }
 
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+obfuscation {
+    createRemappingConfiguration(configurations.localRuntime)
+}
+
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     // MP3格式音频支持
-    jarJar(minecraftLibrary("com.googlecode.soundlibs:mp3spi:1.9.5.4")) {
-        jarJar.ranged(it, "[1.9.5.4,)")
+    jarJar(implementation('com.googlecode.soundlibs:mp3spi:1.9.5.4')) {
+        version {
+            strictly '[1.9.5.4,)'
+            prefer '1.9.5.4'
+        }
     }
-    jarJar(minecraftLibrary("com.googlecode.soundlibs:jlayer:1.0.1.4")) {
-        jarJar.ranged(it, "[1.0.1.4,)")
+    jarJar(implementation('com.googlecode.soundlibs:jlayer:1.0.1.4')) {
+        version {
+            strictly '[1.0.1.4,)'
+            prefer '1.0.1.4'
+        }
     }
-    jarJar(minecraftLibrary("com.googlecode.soundlibs:tritonus-share:0.3.7.4")) {
-        jarJar.ranged(it, "[0.3.7.4,)")
+    jarJar(implementation('com.googlecode.soundlibs:tritonus-share:0.3.7.4')) {
+        version {
+            strictly '[0.3.7.4,)'
+            prefer '0.3.7.4'
+        }
     }
     // JS支持
-    jarJar(minecraftLibrary("ywzj:rhino-1.8.1-SNAPSHOT:1")) {
-        jarJar.ranged(it, "[1.8.0,2.0.0)")
+    jarJar(implementation('ywzj:rhino:1.8.1-SNAPSHOT')) {
+        version {
+            strictly '[1.8.1-SNAPSHOT,)'
+            prefer '1.8.1-SNAPSHOT'
+        }
     }
+    additionalRuntimeClasspath 'ywzj:rhino:1.8.1-SNAPSHOT'
     // SBM
-    jarJar(implementation(fg.deobf("com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1"))) {
-        jarJar.ranged(it, "[2.5.1-forge-mc1.20.1,)")
+    jarJar(modImplementation('com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1')) {
+        version {
+            strictly '[2.5.1-forge-mc1.20.1,)'
+            prefer '2.5.1-forge-mc1.20.1'
+        }
     }
-    compileOnly("com.maydaymemory:mae:1.1.2") {
+    compileOnly('com.maydaymemory:mae:1.1.2') {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
         exclude group: 'it.unimi.dsi', module: 'fastutil'
         exclude group: 'org.joml', module: 'joml'
     }
     // JEI
-    implementation fg.deobf("mezz.jei:jei-1.20.1-common-api:15.20.0.104")
-    implementation fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.20.0.104")
-    runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.104')
+    modCompileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"
+    modCompileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
+    modLocalRuntime "mezz.jei:jei-1.20.1-forge:${jei_version}"
     // 兼容性测试
-//    implementation fg.deobf("local:sound-physics-remastered-forge:1.20.1-1.5.1")
-    if (!project.gradle.startParameter.taskNames.any { it.contains("runServer") }) {
-        runtimeOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
-        runtimeOnly fg.deobf("curse.maven:rubidium-extra-654373:6101745")
-        runtimeOnly fg.deobf("curse.maven:oculus-581495:6020952")
+//    modImplementation 'local:sound-physics-remastered-forge:1.20.1-1.5.1'
+    if (!project.gradle.startParameter.taskNames.any { it.contains('runServer') }) {
+        modLocalRuntime 'maven.modrinth:embeddium:0.3.31+mc1.20.1'
+        modLocalRuntime 'curse.maven:rubidium-extra-654373:6101745'
+        modLocalRuntime 'curse.maven:oculus-581495:6020952'
     }
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation 'org.jetbrains:annotations:26.0.2'
 }
 
-tasks.named('processResources', ProcessResources).configure {
+mixin {
+    config 'mixins.ywzj_midi.json'
+    add sourceSets.main, 'ywzj_midi.refmap.json'
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
     ]
     inputs.properties replaceProperties
-
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
 }
+sourceSets.main.resources.srcDir generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
 tasks.named('jar', Jar).configure {
     manifest {
@@ -162,19 +207,32 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs'            : 'mixins.ywzj_midi.json'
         ])
     }
-    finalizedBy 'reobfJar'
 }
 
-tasks.jarJar.finalizedBy('reobfJarJar')
-
-mixin {
-    config 'mixins.ywzj_midi.json'
-    add sourceSets.main, "ywzj_midi.refmap.json"
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

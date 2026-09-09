@@ -2,7 +2,7 @@
   "type": "ywzj_midi:percussion",
   "name": "cymbal",
   "loop": false,
-  "portable": false,
+  "portable": true,
   "key_start": "c1",
   "key_end": "c1",
   "family": "percussion",
