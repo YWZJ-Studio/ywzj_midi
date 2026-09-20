@@ -49,7 +49,6 @@ public class FileTransfer {
                 byte[] networkBytes = bs.toByteArray();
                 if (data.type == 0) {
                     File file = MidiFiles.MID_PATH.toPath().resolve(data.fileName).toFile();
-                    // check if mid before saving
                     try {
                         MidiSystem.getSequence(new ByteArrayInputStream(networkBytes));
                         FileUtils.writeByteArrayToFile(file, networkBytes);

@@ -31,7 +31,7 @@ public class WaterfallPlayer extends InstrumentMidiPlayer {
     public boolean open(File file) {
         waterNotes.clear();
         currentTick = 0;
-        // Pre-parse notes from all tracks before super.open() consumes them
+        // 启动播放前预先解析所有音轨的瀑布音符。
         try {
             Sequence sequence = MidiSystem.getSequence(file);
             for (Track track : sequence.getTracks()) {
@@ -99,7 +99,7 @@ public class WaterfallPlayer extends InstrumentMidiPlayer {
     }
 
     private void parseWaterNotes(Track track) {
-        // key: (channel << 8) | note, value: pending note info
+        // 以（通道 << 8）| 音符为键，记录尚未结束的音符。
         record Pending(int note, int velocity, long startTick, int channel) {}
         var pending = new HashMap<Integer, Pending>();
 

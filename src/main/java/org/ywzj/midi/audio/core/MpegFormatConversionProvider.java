@@ -17,28 +17,24 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
 
     private static final AudioFormat[] INPUT_FORMATS =
             {
-                    // mono
+                    // 单声道
                     new AudioFormat(MPEG1L3, -1.0F, -1, 1, -1, -1.0F, false),
                     new AudioFormat(MPEG1L3, -1.0F, -1, 1, -1, -1.0F, true),
-                    // stereo
+                    // 立体声
                     new AudioFormat(MPEG1L3, -1.0F, -1, 2, -1, -1.0F, false),
                     new AudioFormat(MPEG1L3, -1.0F, -1, 2, -1, -1.0F, true),
             };
 
-
     private static final AudioFormat[] OUTPUT_FORMATS =
             {
-                    // mono, 16 bit signed
+                    // 单声道，16 位有符号采样
                     new AudioFormat(PCM_SIGNED, -1.0F, 16, 1, 2, -1.0F, false),
                     new AudioFormat(PCM_SIGNED, -1.0F, 16, 1, 2, -1.0F, true),
-                    // stereo, 16 bit signed
+                    // 立体声，16 位有符号采样
                     new AudioFormat(PCM_SIGNED, -1.0F, 16, 2, 4, -1.0F, false),
                     new AudioFormat(PCM_SIGNED, -1.0F, 16, 2, 4, -1.0F, true),
             };
 
-    /**
-     * Constructor.
-     */
     public MpegFormatConversionProvider() {
         super(Arrays.asList(INPUT_FORMATS), Arrays.asList(OUTPUT_FORMATS));
         if (TDebug.TraceAudioConverter) {
@@ -53,13 +49,7 @@ public class MpegFormatConversionProvider extends TEncodingFormatConversionProvi
         return new DecodedMpegAudioInputStream(targetFormat, audioInputStream);
     }
 
-    /**
-     * Add conversion support for any MpegEncoding source with FrameRate or FrameSize not empty.
-     *
-     * @param targetFormat
-     * @param sourceFormat
-     * @return
-     */
+    /** 兼容已指定帧率或帧大小的 MPEG 源格式。 */
     public boolean isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat) {
         if (TDebug.TraceAudioConverter) {
             TDebug.out(">MpegFormatConversionProvider.isConversionSupported(AudioFormat targetFormat, AudioFormat sourceFormat):");

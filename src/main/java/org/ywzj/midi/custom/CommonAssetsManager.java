@@ -1,6 +1,5 @@
 package org.ywzj.midi.custom;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -13,7 +12,9 @@ import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.api.custom.IInstrumentDataManager;
 import org.ywzj.midi.api.custom.IInstrumentModelManager;
 import org.ywzj.midi.network.Channel;
+import org.ywzj.midi.network.CommonAssetsPayload;
 import org.ywzj.midi.network.SliceReassembler;
+import org.ywzj.midi.network.message.ServerSlicedPacket;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonAssetsManager {
@@ -52,16 +53,16 @@ public class CommonAssetsManager {
     @SubscribeEvent
     public static void onDatapackSync(OnDatapackSyncEvent event) {
         if (INSTANCE != null) {
-            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            buf.writeMap(INSTANCE.instrumentModelManager.getCache(),
-                    FriendlyByteBuf::writeResourceLocation,
-                    FriendlyByteBuf::writeUtf);
-            buf.writeMap(INSTANCE.instrumentDataManager.getCache(),
-                    FriendlyByteBuf::writeResourceLocation,
-                    FriendlyByteBuf::writeUtf);
-
-            // 切片发送
-            var packets = SliceReassembler.sliceData(buf);
+            FriendlyByteBuf buf = new CommonAssetsPayload(
+                    INSTANCE.instrumentModelManager.getCache(),
+                    INSTANCE.instrumentDataManager.getCache()).encode();
+            ServerSlicedPacket[] packets;
+            try {
+                // 先整体压缩，再分包。
+                packets = SliceReassembler.sliceData(buf);
+            } finally {
+                buf.release();
+            }
 
             for (var packet : packets) {
                 if (event.getPlayer() != null) {
@@ -76,11 +77,9 @@ public class CommonAssetsManager {
     // 收到所有数据包后组装数据并重载
     public static void fromNetwork(FriendlyByteBuf buf) {
         try {
-            var instrumentModelMap = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readUtf);
-            var instrumentDataMap = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readUtf);
-
-            InstrumentModelManager.fromNetwork(instrumentModelMap);
-            InstrumentDataManager.fromNetwork(instrumentDataMap);
+            CommonAssetsPayload payload = CommonAssetsPayload.decode(buf);
+            InstrumentModelManager.fromNetwork(payload.instrumentModels());
+            InstrumentDataManager.fromNetwork(payload.instrumentData());
         } catch (Exception exception) {
             YwzjMidi.LOGGER.error("Failed to read common assets from network", exception);
         }

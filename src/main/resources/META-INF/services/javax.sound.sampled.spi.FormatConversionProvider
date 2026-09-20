@@ -1,2 +1,2 @@
-# for the javalayer mp3 decoder
+# JLayer MP3 解码器
 org.ywzj.midi.audio.core.MpegFormatConversionProvider

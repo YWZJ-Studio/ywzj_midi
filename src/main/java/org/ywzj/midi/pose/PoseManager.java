@@ -62,7 +62,7 @@ public class PoseManager {
         if (player.level().isClientSide) {
             publishClient(player.getUUID(), pose);
         } else {
-            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), pose));
+            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), pose), true);
         }
     }
 
@@ -71,7 +71,7 @@ public class PoseManager {
         if (player.level().isClientSide) {
             publishClient(player.getUUID(), pose, instrument, notes);
         } else {
-            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), pose));
+            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), pose), true);
         }
     }
 
@@ -79,17 +79,16 @@ public class PoseManager {
         if (!(playerUuid.equals(Minecraft.getInstance().player.getUUID())
                 && Minecraft.getInstance().options.getCameraType().isFirstPerson())) {
             push(playerUuid, pose);
+        } else {
+            // 第一人称仅隐藏演奏者身体，仍需更新琴键动画。
+            updateInstrumentEntityNotes(pose);
         }
         Channel.CHANNEL.sendToServer(new CPoseData(playerUuid, pose));
     }
 
     private static void publishClient(UUID playerUuid, PlayPose pose, Instrument instrument, List<Integer> notes) {
         pose.setNotes(instrument.getInstrumentId(), notes);
-        if (!(playerUuid.equals(Minecraft.getInstance().player.getUUID())
-                && Minecraft.getInstance().options.getCameraType().isFirstPerson())) {
-            push(playerUuid, pose);
-        }
-        Channel.CHANNEL.sendToServer(new CPoseData(playerUuid, pose));
+        publishClient(playerUuid, pose);
     }
 
     public static void push(UUID playerUuid, PlayPose pose) {
@@ -106,7 +105,7 @@ public class PoseManager {
             PlayPose pose = poses.poll();
             if (pose != null) {
                 POSE_CACHE.put(playerUuid, new Pair<>(pose, 1000));
-                updateInstrumentEntityNotes(pose);
+                // 琴键状态已在收包时更新，队列中的手臂帧不能回写旧状态。
                 if (pose.instrumentId != null && pose.notes != null && !pose.notes.isEmpty()) {
                     Instrument instrument = AllInstruments.fromId(pose.instrumentId);
                     if (instrument != null) {
@@ -153,7 +152,7 @@ public class PoseManager {
             clearClientCache(player.getUUID());
             Channel.CHANNEL.sendToServer(new CPoseData(player.getUUID(), new PlayPose()));
         } else {
-            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), new PlayPose()));
+            PoseHandler.broadcastPose(player, new CPoseData(player.getUUID(), new PlayPose()), true);
         }
     }
 

@@ -13,9 +13,7 @@ import org.ywzj.midi.YwzjMidi;
 
 import java.util.*;
 
-/**
- * Client-side instrument display instance: bedrock model + texture + slot texture.
- */
+/** 客户端乐器外观：基岩模型、纹理和物品栏纹理。 */
 public class BaseInstrumentDisplay {
 
     private final ResourceLocation displayId;

@@ -12,14 +12,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SliceReassembler {
 
     private static final Map<UUID, Collector> collectors = new ConcurrentHashMap<>();
-    public static final int SLICE_SIZE = 256 * 1024; // 默认一个切片最大256KB
+    public static final int SLICE_SIZE = 256 * 1024;
 
     public static void receiveSlice(UUID id, int index, int total, byte[] data) {
         Collector c = collectors.computeIfAbsent(id, k -> new Collector(total));
         if (c.addPart(index, data)) {
             FriendlyByteBuf buf = c.assembleToBuffer();
             collectors.remove(id);
-            CommonAssetsManager.fromNetwork(buf);
+            try {
+                CommonAssetsManager.fromNetwork(buf);
+            } finally {
+                buf.release();
+            }
         }
     }
 
@@ -63,7 +67,6 @@ public class SliceReassembler {
             this.parts = new byte[total][];
         }
 
-        // return true when all parts received
         synchronized boolean addPart(int idx, byte[] part) {
             if (idx < 0 || idx >= total) return false;
             if (parts[idx] == null) {

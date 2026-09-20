@@ -23,7 +23,7 @@ public class AllItems {
     public static final RegistryObject<InstrumentEntityItem> INSTRUMENT_ENTITY_ITEM = registerItem("instrument_entity_item", () -> new InstrumentEntityItem(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<InstrumentToolItem> INSTRUMENT_TOOL_ITEM = registerItem("instrument_tool_item", () -> new InstrumentToolItem(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<PlainTextureItem> PLAIN_TEXTURE_ITEM = registerItem("plain_texture_item", () -> new PlainTextureItem(new Item.Properties().stacksTo(1)), false);
-    // 仅用于读取java模型
+    // 仅用于读取 Java 模型
     public static final RegistryObject<Item> VIOLIN = registerItem("violin", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> CFX = registerItem("cfx", () -> new Item(new Item.Properties().stacksTo(1)), false);
     public static final RegistryObject<Item> VIOLA = registerItem("viola", () -> new Item(new Item.Properties().stacksTo(1)), false);

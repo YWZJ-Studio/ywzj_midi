@@ -2,6 +2,9 @@ package org.ywzj.midi.instrument.player;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.ywzj.midi.all.AllInstruments;
+import org.ywzj.midi.custom.instrument.KeyboardInstrumentData;
+import org.ywzj.midi.entity.InstrumentEntity;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.instrument.receiver.MidiReceiver;
 import org.ywzj.midi.util.ComponentUtils;
@@ -212,7 +215,32 @@ public abstract class MidiPlayer {
             if (instrument == null) {
                 return;
             }
-            receivers.put(player.getUUID(), instrument.receiver(player, null));
+            InstrumentEntity entity = findInstrumentEntity(player);
+            MidiReceiver receiver = instrument.receiver(player, entity == null ? null : entity.position());
+            if (entity != null) {
+                // 只绑定数据包目标，保留实体交互界面的接收器。
+                receiver.setInstrumentEntityId(entity.getId());
+            }
+            receivers.put(player.getUUID(), receiver);
+        }
+
+        private InstrumentEntity findInstrumentEntity(LivingEntity player) {
+            if (instrument.isPortable()) {
+                return null;
+            }
+            boolean keyboard = instrument.getData() instanceof KeyboardInstrumentData;
+            return player.level().getEntitiesOfClass(InstrumentEntity.class, player.getBoundingBox().inflate(3), entity -> {
+                if (!entity.isAlive() || player.distanceToSqr(entity) >= 9) {
+                    return false;
+                }
+                var entityInstrumentId = entity.getInstrumentId();
+                if (instrument.getInstrumentId().equals(entityInstrumentId)) {
+                    return true;
+                }
+                // 钢琴外观可与通道音色不同，但共用键位布局。
+                Instrument nearby = keyboard && entityInstrumentId != null ? AllInstruments.fromId(entityInstrumentId) : null;
+                return nearby != null && nearby.getData() instanceof KeyboardInstrumentData;
+            }).stream().min(Comparator.comparingDouble(player::distanceToSqr)).orElse(null);
         }
 
         public void registerReceiver(MidiReceiver receiver) {
@@ -220,6 +248,8 @@ public abstract class MidiPlayer {
         }
 
         public void clearReceiver() {
+            receivers.values().forEach(MidiReceiver::stopPose);
+            receivers.values().forEach(MidiReceiver::stopAllKeys);
             receivers.clear();
         }
 

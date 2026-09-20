@@ -33,8 +33,7 @@ public class BrassMidiReceiver extends MidiReceiver {
                 var ctx = new MidiPoseScriptContext(note, velocity, instrument.getInstrumentId());
                 PoseManager.PlayPose pose = MidiScriptPoseProvider.getInstance().computePlayPose(instrument, ctx);
                 if (pose != null) {
-                    // Trombone's item model consumes note metadata to update
-                    // its slide, as in TrombonePlayPose.play(int).
+                    // 长号物品模型依赖音符元数据更新滑管。
                     if (instrument.getInstrumentId().equals(YwzjMidi.modLocation("trombone"))) {
                         publish(pose, instrument, Collections.singletonList(note));
                     } else {

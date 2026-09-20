@@ -5,12 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * 乐器配置数据类型，用于从数据包反序列化乐器参数。
- * 参照载具模组的 VehicleDataType 设计。
- *
- * @param <T> 数据类型
- */
+/** 乐器配置数据类型，用于反序列化乐器参数。 */
 public record InstrumentDataType<T extends BaseInstrumentData>(
         ResourceLocation id,
         DataSerializer<T> dataSerializer

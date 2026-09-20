@@ -37,9 +37,6 @@ public class ScreenManager {
         Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(CONDUCTOR_SCREEN));
     }
 
-    /**
-     * Open screen for a block-position-based instrument (piano, timpani, etc.)
-     */
     public static void openPianoScreen(BlockPos pos, Instrument instrument, PianoBlockEntity pianoBlockEntity) {
         if (!checkDistance(pos, 3)) return;
         if (pianoBlockEntity.clavichordScreen == null) {
@@ -48,10 +45,6 @@ public class ScreenManager {
         openMidiInstrumentScreen(pianoBlockEntity.clavichordScreen);
     }
 
-    /**
-     * Generic instrument screen opener for item-based instruments.
-     * Dispatches to the correct screen based on instrument type.
-     */
     public static void openInstrumentScreen(Instrument instrument, Player player) {
         String name = instrument.getName();
         MidiInstrumentScreen screen = instrumentScreens.get(name);
@@ -66,9 +59,6 @@ public class ScreenManager {
         }
     }
 
-    /**
-     * Open screen for an entity-based instrument (piano, timpani, bass drum, etc. placed in world).
-     */
     public static void openInstrumentEntityScreen(Instrument instrument, InstrumentEntity entity) {
         MidiInstrumentScreen screen = entityInstrumentScreens.get(entity.getUUID());
         if (screen == null) {

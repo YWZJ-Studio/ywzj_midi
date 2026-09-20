@@ -5,10 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 
-/**
- * POJO for instrument display definition JSON.
- * Lives at assets/<namespace>/display/instrument/<name>.json
- */
 public class BaseInstrumentDisplayPojo {
 
     @SerializedName("model")

@@ -75,7 +75,7 @@ public enum ClientAssetsManager {
                     Minecraft.getInstance().textureManager.register(display.getSlotTexture(), new SimpleTexture(display.getSlotTexture()));
                 }
             } catch (Exception e) {
-                // texture may already be registered
+                // 纹理可能已注册，忽略重复注册异常
             }
         });
     }

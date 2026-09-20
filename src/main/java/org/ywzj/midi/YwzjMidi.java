@@ -23,7 +23,7 @@ import org.ywzj.midi.resource.InstrumentPackLoader;
 public class YwzjMidi {
 
     public static final String MOD_ID = "ywzj_midi";
-    public static final String PROTOCOL = "1.6";
+    public static final String PROTOCOL = "1.7";
     public static final String CHANNEL = "ywzj_midi_channel";
     public static final Logger LOGGER = LogManager.getLogger(YwzjMidi.class);
 

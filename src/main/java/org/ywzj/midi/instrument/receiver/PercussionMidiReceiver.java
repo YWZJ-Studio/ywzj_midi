@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class PercussionMidiReceiver extends MidiReceiver {
 
-    private int percussionMode; // 0=timpani, 1=bass_drum, 2=cymbal
+    private int percussionMode; // 0：定音鼓，1：大鼓，2：镲
 
     public PercussionMidiReceiver(Instrument instrument, LivingEntity player, Vec3 pos) {
         super(instrument, player, pos);
@@ -45,18 +45,17 @@ public class PercussionMidiReceiver extends MidiReceiver {
                 }
                 publishStrikeFrames(note, velocity);
                 if (percussionMode == 2) {
-                    // Cymbal: always play c1
+                    // 镲固定使用 c1 音色。
                     UUID uuid = UUID.randomUUID();
                     playNote(MidiUtils.notationToNote("c1"), velocity, delay);
                     playedKeys.put(note, uuid);
                 } else if (percussionMode == 1) {
-                    // Bass drum: map velocity to fixed note
+                    // 大鼓按力度选择采样音符。
                     UUID uuid = UUID.randomUUID();
                     NotePlayer.playNote(uuid, portable ? player.position() : pos, instrument,
                             variantId, toBassDrumNote(velocity), velocity, delay, player);
                     playedKeys.put(note, uuid);
                 } else {
-                    // Timpani: play the actual note
                     playNote(note, velocity, delay);
                 }
             } else if (command == ShortMessage.NOTE_OFF) {

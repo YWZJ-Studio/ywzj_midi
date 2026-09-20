@@ -61,7 +61,7 @@ public class ViolMidiReceiver extends MidiReceiver {
                 }
                 playNote(variantId, note, velocity, delay);
                 if (variantId == 0) {
-                    // Bowing mode
+                    // 拉弓模式
                     if (lastTimeStamp == 0 || timeStamp < lastTimeStamp) {
                         poseContext.resetState();
                         startBowLoop();
@@ -71,7 +71,7 @@ public class ViolMidiReceiver extends MidiReceiver {
                         poseContext.resetState();
                     }
                 } else {
-                    // Pizzicato mode
+                    // 拨弦模式
                     poseContext.setInt("variantId", 1);
                     poseContext.setInt("pizzStep", 0);
                     for (int i = 0; i < 7; i++) {

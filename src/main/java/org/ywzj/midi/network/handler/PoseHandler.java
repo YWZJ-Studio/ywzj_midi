@@ -20,8 +20,12 @@ public class PoseHandler {
     }
 
     public static void broadcastPose(LivingEntity sender, CPoseData message) {
+        broadcastPose(sender, message, false);
+    }
+
+    public static void broadcastPose(LivingEntity sender, CPoseData message, boolean includeSender) {
         for (ServerPlayer player : sender.level().getServer().getPlayerList().getPlayers()) {
-            if (player.equals(sender)) {
+            if (!includeSender && player.equals(sender)) {
                 continue;
             }
             if (player.level().dimension().equals(sender.level().dimension()) && player.distanceTo(sender) < 64) {

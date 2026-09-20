@@ -125,7 +125,7 @@ public class InstrumentEntityRenderer extends EntityRenderer<InstrumentEntity> {
             return null;
         }
 
-        // Resolve bone indices and sort: ArrayPoseBuilder requires strictly ascending order
+        // ArrayPoseBuilder 要求骨骼索引严格递增。
         var sorted = new ArrayList<Map.Entry<Integer, MidiPoseBuilder.BoneTransform>>();
         for (var entry : bonePoses.entrySet()) {
             int boneIndex = model.getIndex(entry.getKey());

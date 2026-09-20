@@ -26,27 +26,27 @@ public class WaterfallScreen extends Screen {
 
     private static final int MIN_NOTE = 12;
     private static final int MAX_NOTE = 108;
-    private static final int KEY_COUNT = MAX_NOTE - MIN_NOTE + 1; // 97
+    private static final int KEY_COUNT = MAX_NOTE - MIN_NOTE + 1;
 
-    private static final long LOOKAHEAD_TICKS = 1920; // ~4 beats at 480 PPQ
+    private static final long LOOKAHEAD_TICKS = 1920; // 每四分音符 480 tick 时约为 4 拍
 
     private static final int[] CHANNEL_COLORS = {
-            0xFF4A90D9, // blue
-            0xFF50B86C, // green
-            0xFFE8843C, // orange
-            0xFF9B59B6, // purple
-            0xFFE74C8B, // pink
-            0xFF1ABC9C, // teal
-            0xFFF1C40F, // yellow
-            0xFFE67E22, // dark orange
-            0xFF3498DB, // light blue
-            0xFF2ECC71, // emerald
-            0xFFE91E63, // deep pink
-            0xFF00BCD4, // cyan
-            0xFFFF9800, // amber
-            0xFF8BC34A, // light green
-            0xFF795548, // brown
-            0xFF607D8B, // blue grey
+            0xFF4A90D9,
+            0xFF50B86C,
+            0xFFE8843C,
+            0xFF9B59B6,
+            0xFFE74C8B,
+            0xFF1ABC9C,
+            0xFFF1C40F,
+            0xFFE67E22,
+            0xFF3498DB,
+            0xFF2ECC71,
+            0xFFE91E63,
+            0xFF00BCD4,
+            0xFFFF9800,
+            0xFF8BC34A,
+            0xFF795548,
+            0xFF607D8B,
     };
 
     private final WaterfallPlayer waterfallPlayer;
@@ -78,7 +78,7 @@ public class WaterfallScreen extends Screen {
         float pxPerTick = waterfallWidth / (float) LOOKAHEAD_TICKS;
         long currentTick = waterfallPlayer.getCurrentTick();
 
-        // Interpolate tick based on real elapsed time for smooth animation
+        // 按实际经过时间推算 tick，使动画平滑。
         if (waterfallPlayer.isPlaying()) {
             double msPerTick = waterfallPlayer.getCurrentMsPerTick();
             if (msPerTick > 0) {
@@ -91,7 +91,6 @@ public class WaterfallScreen extends Screen {
         List<WaterfallNote> notes = waterfallPlayer.getWaterNotes();
         RenderSystem.enableBlend();
 
-        // Draw waterfall notes
         for (WaterfallNote note : notes) {
             long start = note.startTick();
             long end = start + note.duration();
@@ -131,7 +130,7 @@ public class WaterfallScreen extends Screen {
             graphics.fill((int) noteX, (int) (noteY + noteH) - 1, (int) (noteX + noteW), (int) (noteY + noteH), borderColor);
         }
 
-        // Draw full keyboard texture rotated 90° on the left side
+        // 将完整键盘纹理旋转 90°，绘制到左侧。
         RenderSystem.setShaderTexture(0, KEYBOARD_TEX);
         graphics.pose().pushPose();
         graphics.pose().translate(KEYBOARD_WIDTH, 0, 0);
@@ -142,10 +141,10 @@ public class WaterfallScreen extends Screen {
         graphics.blit(KEYBOARD_TEX, 0, 0, 0, 0, TEX_W, TEX_H, TEX_W, TEX_H);
         graphics.pose().popPose();
 
-        // Draw the trigger line
+        // 音符触发线
         graphics.fill(KEYBOARD_WIDTH, 0, KEYBOARD_WIDTH + KEY_LINE_WIDTH, screenHeight, 0xFFFFFFFF);
 
-        // Draw C note labels
+        // 标注各八度的 C 音
         int textColor = 0xFF888888;
         for (int note = MIN_NOTE; note <= MAX_NOTE; note++) {
             if (note % 12 == 0) {
@@ -157,13 +156,11 @@ public class WaterfallScreen extends Screen {
             }
         }
 
-        // Current tick indicator
         String tickInfo = "Tick: " + currentTick;
         graphics.drawString(this.font, tickInfo, waterfallLeft + 4, 4, 0xFFFFFFFF);
 
         RenderSystem.disableBlend();
 
-        // Render widgets (none by default, but subclasses or future additions may add them)
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 

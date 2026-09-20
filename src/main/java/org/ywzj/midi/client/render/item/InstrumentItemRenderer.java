@@ -75,7 +75,7 @@ public class InstrumentItemRenderer extends BlockEntityWithoutLevelRenderer {
             }
             poseStack.popPose();
         } else {
-            // 若无基岩模型，尝试使用对应java物品来渲染
+            // 无基岩模型时，使用对应的 Java 物品模型渲染。
             var plainItem = AllItems.ITEMS_LOOKUP.get(displayId.getPath());
             if (plainItem != null && plainItem.get() != null) {
                 ItemStack fallbackStack = new ItemStack(plainItem.get());

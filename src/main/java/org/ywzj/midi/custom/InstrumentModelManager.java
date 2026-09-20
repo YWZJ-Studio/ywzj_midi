@@ -28,7 +28,7 @@ public class InstrumentModelManager extends SimplePreparableReloadListener<Map<R
     private Map<ResourceLocation, BedrockModel> instrumentModels = Map.of();
     private Map<ResourceLocation, String> cache = Map.of();
 
-    // Client-side cache for models received from server
+    // 客户端缓存服务端下发的模型。
     enum ClientCache implements IInstrumentModelManager {
         INSTANCE;
         private Map<ResourceLocation, BedrockModel> indexes = Map.of();

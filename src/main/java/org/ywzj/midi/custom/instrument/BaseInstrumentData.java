@@ -61,10 +61,6 @@ public abstract class BaseInstrumentData {
         }
     }
 
-    /**
-     * 创建此乐器数据对应的 MidiReceiver 实例。
-     * 由子类覆写以返回正确的 receiver 类型。
-     */
     @Nullable
     public abstract MidiReceiver createReceiver(Instrument instrument, LivingEntity player, Vec3 pos);
 

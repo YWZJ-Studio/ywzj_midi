@@ -54,9 +54,7 @@ public class MidiScriptPoseProvider {
         return initialized && scriptManager != null;
     }
 
-    /**
-     * Try to lazy-initialize from the script manager. Called on first pose computation or after reload.
-     */
+    /** 首次计算姿态或重载后，延迟初始化脚本。 */
     public synchronized void ensureInitialized() {
         if (initialized && !instrumentScopes.isEmpty()) {
             return;
@@ -171,9 +169,7 @@ public class MidiScriptPoseProvider {
         return null;
     }
 
-    /**
-     * Load a script by name, even if it's not a registered instrument (e.g. conductor).
-     */
+    /** 按名称加载脚本，支持指挥等未注册为乐器的脚本。 */
     public synchronized void ensureScript(ResourceLocation id) {
         if (playPoseFunctions.containsKey(id)) {
             return;

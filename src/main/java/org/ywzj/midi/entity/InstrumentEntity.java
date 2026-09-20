@@ -209,7 +209,7 @@ public class InstrumentEntity extends Entity {
 
     @Override
     public void push(Entity entity) {
-        if (!this.isPushable() || entity.isRemoved() || !entity.isPushable()) {
+        if (!(entity instanceof Player) || !this.isPushable() || entity.isRemoved() || !entity.isPushable()) {
             return;
         }
         double xDifference = this.getX() - entity.getX();
@@ -222,6 +222,9 @@ public class InstrumentEntity extends Entity {
         this.setDeltaMovement(this.getDeltaMovement().add(xDifference * push, 0.0D, zDifference * push));
         this.hasImpulse = true;
     }
+
+    @Override
+    public void push(double x, double y, double z) {}
 
     public void setReceiver(MidiReceiver receiver) {
         this.receiver = receiver;
