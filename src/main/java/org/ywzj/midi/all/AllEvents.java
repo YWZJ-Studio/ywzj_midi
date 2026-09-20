@@ -3,17 +3,16 @@ package org.ywzj.midi.all;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import org.ywzj.midi.YwzjMidi;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import org.ywzj.midi.audio.ServerSoundManager;
 import org.ywzj.midi.client.resource.ClientAssetsManager;
 import org.ywzj.midi.entity.InstrumentEntity;
@@ -24,7 +23,7 @@ import java.util.UUID;
 
 public class AllEvents {
 
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @EventBusSubscriber
     public static class AllForgeEvents {
 
         @SubscribeEvent
@@ -48,19 +47,19 @@ public class AllEvents {
         }
 
         @SubscribeEvent
-        public static void onPickup(EntityItemPickupEvent event) {
-            ItemStack itemStack = event.getItem().getItem();
+        public static void onPickup(ItemEntityPickupEvent.Post event) {
+            ItemStack itemStack = event.getOriginalStack();
             if (itemStack.getItem() instanceof MusicPlayerItem) {
                 UUID musicPlayerUuid = MusicPlayerItem.getUUID(itemStack);
                 if (musicPlayerUuid != null) {
-                    ServerSoundManager.PLAY_ENTITIES.put(musicPlayerUuid, event.getEntity());
+                    ServerSoundManager.PLAY_ENTITIES.put(musicPlayerUuid, event.getPlayer());
                 }
             }
         }
 
     }
 
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber
     public static class AllModEvents {
 
         @SubscribeEvent
@@ -76,7 +75,7 @@ public class AllEvents {
     }
 
     @OnlyIn(Dist.CLIENT)
-    @Mod.EventBusSubscriber(modid = YwzjMidi.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(value = Dist.CLIENT)
     public static class AllClientModEvents {
 
         @SubscribeEvent

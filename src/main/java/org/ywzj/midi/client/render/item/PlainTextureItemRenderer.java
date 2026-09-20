@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.ywzj.midi.item.PlainTextureItem;
+import org.ywzj.midi.util.ItemStackData;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +32,7 @@ public class PlainTextureItemRenderer extends BlockEntityWithoutLevelRenderer {
         if (!(itemStack.getItem() instanceof PlainTextureItem)) {
             return;
         }
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         ResourceLocation textureLocation = ResourceLocation.tryParse(tag.getString("textureLocation"));
         if (textureLocation == null) {
             return;
@@ -39,8 +40,7 @@ public class PlainTextureItemRenderer extends BlockEntityWithoutLevelRenderer {
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.entityTranslucent(textureLocation));
-        PLAIN_TEXTURE_ITEM_MODEL.renderToBuffer(
-                poseStack, buffer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        PLAIN_TEXTURE_ITEM_MODEL.renderToBuffer(poseStack, buffer, packedLight, packedOverlay);
         poseStack.popPose();
     }
 

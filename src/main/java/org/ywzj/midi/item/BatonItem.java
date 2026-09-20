@@ -43,8 +43,8 @@ public class BatonItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, Level level, List<Component> components, TooltipFlag tooltipFlag) {
-        super.appendHoverText(itemStack, level, components, tooltipFlag);
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> components, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, components, tooltipFlag);
         components.add(ComponentUtils.translatable("tip.ywzj_midi.baton"));
     }
 

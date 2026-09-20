@@ -1,136 +1,70 @@
 package org.ywzj.midi.network;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.network.handler.*;
 import org.ywzj.midi.network.message.*;
 
-import java.util.Optional;
+public final class Channel {
 
-import static net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT;
-import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
+    public static final Sender CHANNEL = new Sender();
 
-public class Channel {
-
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(YwzjMidi.MOD_ID, YwzjMidi.CHANNEL))
-            .networkProtocolVersion(() -> YwzjMidi.PROTOCOL)
-            .clientAcceptedVersions(YwzjMidi.PROTOCOL::equals)
-            .serverAcceptedVersions(YwzjMidi.PROTOCOL::equals)
-            .simpleChannel();
+    private Channel() {
+    }
 
     @SubscribeEvent
-    public static void onCommonSetupEvent(FMLCommonSetupEvent event) {
-
-        CHANNEL.registerMessage(PacketId.C_AA775_UPDATE.value(), CNoteBlockUpdate.class,
-                CNoteBlockUpdate::encode, CNoteBlockUpdate::decode,
-                NoteBlockHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.C_PLAY_NOTE.value(), CPlayNote.class,
-                CPlayNote::encode, CPlayNote::decode,
-                PlayNoteHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_PLAY_NOTE.value(), SPlayNote.class,
-                SPlayNote::encode, SPlayNote::decode,
-                PlayNoteHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_CLIENT));
-
-        CHANNEL.registerMessage(PacketId.C_CHANGE_NOTE.value(), CChangeNote.class,
-                CChangeNote::encode, CChangeNote::decode,
-                ChangeNoteHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_CHANGE_NOTE.value(), SChangeNote.class,
-                SChangeNote::encode, SChangeNote::decode,
-                ChangeNoteHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_CLIENT));
-
-        CHANNEL.registerMessage(PacketId.C_PLAY_MUSIC.value(), CSyncMusic.class,
-                CSyncMusic::encode, CSyncMusic::decode,
-                SyncMusicHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_PLAY_MUSIC.value(), SSyncMusic.class,
-                SSyncMusic::encode, SSyncMusic::decode,
-                SyncMusicHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_CLIENT));
-
-        CHANNEL.registerMessage(PacketId.C_SYNC_MUSIC.value(), CPlayMusic.class,
-                CPlayMusic::encode, CPlayMusic::decode,
-                PlayMusicHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_SYNC_MUSIC.value(), SPlayMusic.class,
-                SPlayMusic::encode, SPlayMusic::decode,
-                PlayMusicHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_CLIENT));
-
-        CHANNEL.registerMessage(PacketId.C_POSE_DATA.value(), CPoseData.class,
-                CPoseData::encode, CPoseData::decode,
-                PoseHandler::onClientMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_POSE_DATA.value(), SPoseData.class,
-                SPoseData::encode, SPoseData::decode,
-                PoseHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_CLIENT));
-
-        CHANNEL.registerMessage(PacketId.C_FAKE_PLAYER_DATA.value(), CFakePlayerUpdate.class,
-                CFakePlayerUpdate::encode, CFakePlayerUpdate::decode,
-                FakePlayerDataHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.C_FILE_DATA.value(), CFileData.class,
-                CFileData::encode, CFileData::decode,
-                FileDataHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.C_PLAY_MIDI.value(), CPlayMidi.class,
-                CPlayMidi::encode, CPlayMidi::decode,
-                ServerPlayMidiHandler::onServerMessageReceived,
-                Optional.of(PLAY_TO_SERVER));
-
-        CHANNEL.registerMessage(PacketId.S_SLICED_PACKET.value(), ServerSlicedPacket.class,
-                ServerSlicedPacket::encode, ServerSlicedPacket::decode,
-                ServerSlicedPacket::handle,
-                Optional.of(PLAY_TO_CLIENT));
-
+    public static void register(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(YwzjMidi.PROTOCOL);
+        registrar.playBidirectional(MidiPacket.TYPE, MidiPacket.STREAM_CODEC, Channel::handle);
     }
 
-}
-
-enum PacketId {
-
-    C_AA775_UPDATE(99),
-    C_PLAY_NOTE(100),
-    S_PLAY_NOTE(101),
-    C_CHANGE_NOTE(102),
-    S_CHANGE_NOTE(103),
-    C_PLAY_MUSIC(104),
-    S_PLAY_MUSIC(105),
-    C_SYNC_MUSIC(106),
-    S_SYNC_MUSIC(107),
-    C_POSE_DATA(108),
-    S_POSE_DATA(109),
-    C_FAKE_PLAYER_DATA(110),
-    C_FILE_DATA(111),
-    C_PLAY_MIDI(112),
-    S_SLICED_PACKET(113);
-
-    private final int id;
-
-    PacketId(int id) {
-        this.id = id;
+    private static void handle(MidiPacket packet, IPayloadContext context) {
+        boolean serverbound = MidiPacket.isServerbound(packet.id());
+        if ((serverbound && context.flow() != PacketFlow.SERVERBOUND)
+                || (!serverbound && context.flow() != PacketFlow.CLIENTBOUND)) {
+            context.disconnect(Component.literal("Invalid MIDI packet direction"));
+            return;
+        }
+        Object message = packet.decodeMessage();
+        switch (packet.id()) {
+            case MidiPacket.C_AA775_UPDATE -> NoteBlockHandler.onClientMessageReceived((CNoteBlockUpdate) message, context);
+            case MidiPacket.C_PLAY_NOTE -> PlayNoteHandler.onClientMessageReceived((CPlayNote) message, context);
+            case MidiPacket.S_PLAY_NOTE -> PlayNoteHandler.onServerMessageReceived((SPlayNote) message, context);
+            case MidiPacket.C_CHANGE_NOTE -> ChangeNoteHandler.onClientMessageReceived((CChangeNote) message, context);
+            case MidiPacket.S_CHANGE_NOTE -> ChangeNoteHandler.onServerMessageReceived((SChangeNote) message, context);
+            case MidiPacket.C_PLAY_MUSIC -> SyncMusicHandler.onClientMessageReceived((CSyncMusic) message, context);
+            case MidiPacket.S_PLAY_MUSIC -> SyncMusicHandler.onServerMessageReceived((SSyncMusic) message, context);
+            case MidiPacket.C_SYNC_MUSIC -> PlayMusicHandler.onClientMessageReceived((CPlayMusic) message, context);
+            case MidiPacket.S_SYNC_MUSIC -> PlayMusicHandler.onServerMessageReceived((SPlayMusic) message, context);
+            case MidiPacket.C_POSE_DATA -> PoseHandler.onClientMessageReceived((CPoseData) message, context);
+            case MidiPacket.S_POSE_DATA -> PoseHandler.onServerMessageReceived((SPoseData) message, context);
+            case MidiPacket.C_FAKE_PLAYER_DATA -> FakePlayerDataHandler.onServerMessageReceived((CFakePlayerUpdate) message, context);
+            case MidiPacket.C_FILE_DATA -> FileDataHandler.onServerMessageReceived((CFileData) message, context);
+            case MidiPacket.C_PLAY_MIDI -> ServerPlayMidiHandler.onServerMessageReceived((CPlayMidi) message, context);
+            case MidiPacket.S_SLICED_PACKET -> ServerSlicedPacket.handle((ServerSlicedPacket) message, context);
+            default -> throw new IllegalArgumentException("Unknown MIDI packet id: " + packet.id());
+        }
     }
 
-    int value() {
-        return id;
+    public static final class Sender {
+        public void sendToServer(Object message) {
+            PacketDistributor.sendToServer(MidiPacket.wrap(message));
+        }
+
+        public void sendToPlayer(ServerPlayer player, Object message) {
+            PacketDistributor.sendToPlayer(player, MidiPacket.wrap(message));
+        }
+
+        public void sendToAllPlayers(Object message) {
+            PacketDistributor.sendToAllPlayers(MidiPacket.wrap(message));
+        }
     }
 
 }

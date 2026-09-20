@@ -6,8 +6,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.ywzj.midi.client.render.item.PlainTextureItemRenderer;
+import org.ywzj.midi.util.ItemStackData;
 
 import java.util.function.Consumer;
 
@@ -19,8 +20,9 @@ public class PlainTextureItem extends Item {
 
     public ItemStack createInstance(ResourceLocation textureLocation) {
         ItemStack itemStack = new ItemStack(this);
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         tag.putString("textureLocation", textureLocation.toString());
+        ItemStackData.set(itemStack, tag);
         return itemStack;
     }
 

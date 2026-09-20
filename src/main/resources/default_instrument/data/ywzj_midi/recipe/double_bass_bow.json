@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    "SW ",
+    " K "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "W": {
+      "item": "minecraft:dark_oak_planks"
+    },
+    "K": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "ywzj_midi:instrument_tool_item",
+    "components": {
+      "minecraft:custom_data": {
+        "instrument_tool_id": "double_bass_bow"
+      },
+      "minecraft:custom_name": "{\"translate\":\"item.ywzj_midi.double_bass_bow\"}"
+    }
+  }
+}

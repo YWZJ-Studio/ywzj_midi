@@ -1,8 +1,6 @@
 package org.ywzj.midi.entity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllEntities;
 import org.ywzj.midi.all.AllInstruments;
@@ -57,11 +54,11 @@ public class InstrumentEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DISPLAY_ID, "");
-        this.entityData.define(SWITCHABLE_ON, false);
-        this.entityData.define(INSTRUMENT_NAME, "");
-        this.entityData.define(INSTRUMENT_ID, "");
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DISPLAY_ID, "");
+        builder.define(SWITCHABLE_ON, false);
+        builder.define(INSTRUMENT_NAME, "");
+        builder.define(INSTRUMENT_ID, "");
     }
 
     public ResourceLocation getDisplayId() {
@@ -85,7 +82,7 @@ public class InstrumentEntity extends Entity {
         String raw = this.entityData.get(INSTRUMENT_ID);
         if (!raw.isEmpty()) return ResourceLocation.tryParse(raw);
         String name = getInstrumentName();
-        return name.isEmpty() ? null : new ResourceLocation(YwzjMidi.MOD_ID, name);
+        return name.isEmpty() ? null : YwzjMidi.modLocation(name);
     }
 
     public void setInstrumentId(ResourceLocation id) {
@@ -174,11 +171,6 @@ public class InstrumentEntity extends Entity {
         if (!name.isEmpty()) {
             tag.putString(TAG_INSTRUMENT_NAME, name);
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override

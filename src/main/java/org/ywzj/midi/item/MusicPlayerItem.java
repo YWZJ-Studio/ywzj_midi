@@ -11,6 +11,7 @@ import org.ywzj.midi.audio.ClientPlayerInstance;
 import org.ywzj.midi.gui.ScreenManager;
 import org.ywzj.midi.gui.screen.MusicPlayerScreen;
 import org.ywzj.midi.util.ComponentUtils;
+import org.ywzj.midi.util.ItemStackData;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -50,15 +51,15 @@ public class MusicPlayerItem extends Item {
     }
 
     public static void genUUID(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         if (!tag.contains("uuid")) {
             tag.putUUID("uuid", UUID.randomUUID());
-            itemStack.setTag(tag);
+            ItemStackData.set(itemStack, tag);
         }
     }
 
     public static UUID getUUID(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         if(!tag.contains("uuid")) {
             return null;
         }
@@ -66,19 +67,19 @@ public class MusicPlayerItem extends Item {
     }
 
     public static void genOwner(ItemStack itemStack, Player player) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         if (!tag.contains("owner")) {
             tag.putUUID("owner", player.getUUID());
-            itemStack.setTag(tag);
+            ItemStackData.set(itemStack, tag);
         }
     }
 
     public static UUID getOwner(ItemStack itemStack) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         if (!tag.contains("owner")) {
             return null;
         }
-        return itemStack.getTag().getUUID("owner");
+        return tag.getUUID("owner");
     }
 
 }

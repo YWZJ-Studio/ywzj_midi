@@ -9,8 +9,8 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.ywzj.midi.custom.serialize.GsonUtil;
@@ -69,10 +69,10 @@ public enum ClientAssetsManager {
         instrumentDisplayManager.getDisplayMap().values().forEach(display -> {
             try {
                 if (display.getTexture() != null) {
-                    Minecraft.getInstance().textureManager.register(display.getTexture(), new SimpleTexture(display.getTexture()));
+                    Minecraft.getInstance().getTextureManager().register(display.getTexture(), new SimpleTexture(display.getTexture()));
                 }
                 if (display.getSlotTexture() != null) {
-                    Minecraft.getInstance().textureManager.register(display.getSlotTexture(), new SimpleTexture(display.getSlotTexture()));
+                    Minecraft.getInstance().getTextureManager().register(display.getSlotTexture(), new SimpleTexture(display.getSlotTexture()));
                 }
             } catch (Exception e) {
                 // texture may already be registered

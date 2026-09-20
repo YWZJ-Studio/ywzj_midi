@@ -20,6 +20,7 @@ import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.item.InstrumentItem;
 import org.ywzj.midi.pose.PoseManager;
 import org.ywzj.midi.script.MidiScriptPoseProvider;
+import org.ywzj.midi.util.ItemStackData;
 
 @Mixin(value = HumanoidModel.class)
 public class HumanoidModelMixin {
@@ -111,8 +112,8 @@ public class HumanoidModelMixin {
 
     private PoseManager.PlayPose getScriptHoldPose(ItemStack itemStack, InteractionHand hand) {
         if (itemStack.getItem() instanceof InstrumentItem) {
-            String i = itemStack.getOrCreateTag().getString(InstrumentItem.TAG_INSTRUMENT_ID);
-            Instrument instrument = AllInstruments.fromId(new ResourceLocation(i));
+            String i = ItemStackData.get(itemStack).getString(InstrumentItem.TAG_INSTRUMENT_ID);
+            Instrument instrument = AllInstruments.fromId(ResourceLocation.parse(i));
             if (instrument != null) {
                 return MidiScriptPoseProvider.getInstance().computeHoldPose(instrument, hand);
             }

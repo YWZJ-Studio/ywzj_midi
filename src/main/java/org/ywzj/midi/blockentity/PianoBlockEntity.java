@@ -1,6 +1,7 @@
 package org.ywzj.midi.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -19,12 +20,12 @@ public class PianoBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return new CompoundTag();
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag) {}
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {}
 
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {

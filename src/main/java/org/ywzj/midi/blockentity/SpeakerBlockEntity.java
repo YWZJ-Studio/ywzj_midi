@@ -1,6 +1,7 @@
 package org.ywzj.midi.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -43,8 +44,8 @@ public class SpeakerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
+        super.onDataPacket(net, pkt, registries);
         clientPlayerInstance = getClientPlayerInstance();
         try {
             clientPlayerInstance.soundUuid = pkt.getTag().getUUID("soundUuid");
@@ -58,7 +59,7 @@ public class SpeakerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         return getPersistentData();
     }
 

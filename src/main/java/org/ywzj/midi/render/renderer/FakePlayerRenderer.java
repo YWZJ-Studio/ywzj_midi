@@ -47,7 +47,7 @@ public class FakePlayerRenderer extends LivingEntityRenderer<FakePlayerEntity, F
     @Override
     public ResourceLocation getTextureLocation(FakePlayerEntity fakePlayerEntity) {
         ResourceLocation location = FakePlayerSkin.SKINS.get(fakePlayerEntity.getEntityData().get(FakePlayerEntity.NAME));
-        return location == null ? Minecraft.getInstance().player.getSkinTextureLocation() : location;
+        return location == null ? Minecraft.getInstance().player.getSkin().texture() : location;
     }
 
 }

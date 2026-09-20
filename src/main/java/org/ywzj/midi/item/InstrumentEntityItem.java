@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
@@ -13,11 +15,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.client.render.item.InstrumentItemRenderer;
 import org.ywzj.midi.entity.InstrumentEntity;
 import org.ywzj.midi.instrument.Instrument;
+import org.ywzj.midi.util.ItemStackData;
 
 import java.util.function.Consumer;
 
@@ -31,8 +34,10 @@ public class InstrumentEntityItem extends Item {
 
     public static ItemStack createInstance(ResourceLocation instrumentId, Component name) {
         ItemStack itemStack = new ItemStack(AllItems.INSTRUMENT_ENTITY_ITEM.get());
-        itemStack.getOrCreateTag().putString(InstrumentItem.TAG_INSTRUMENT_ID, instrumentId.toString());
-        itemStack.setHoverName(name);
+        CompoundTag tag = ItemStackData.get(itemStack);
+        tag.putString(InstrumentItem.TAG_INSTRUMENT_ID, instrumentId.toString());
+        ItemStackData.set(itemStack, tag);
+        itemStack.set(DataComponents.CUSTOM_NAME, name);
         return itemStack;
     }
 

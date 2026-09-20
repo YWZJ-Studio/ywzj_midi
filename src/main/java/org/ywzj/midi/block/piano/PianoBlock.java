@@ -1,7 +1,6 @@
 package org.ywzj.midi.block.piano;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -24,7 +23,7 @@ public abstract class PianoBlock extends HorizontalBlock implements EntityBlock 
     protected abstract Instrument getInstrument();
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult ray) {
         if (world.isClientSide) {
             PianoBlockEntity pianoBlockEntity = (PianoBlockEntity) world.getBlockEntity(pos);
             if (pianoBlockEntity == null) {

@@ -81,11 +81,11 @@ public class FakePlayerEntity extends Mob {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(NAME, DEFAULT_NAME);
-        this.entityData.define(SKIN_URL, "");
-        this.entityData.define(IS_SITTING, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(NAME, DEFAULT_NAME);
+        builder.define(SKIN_URL, "");
+        builder.define(IS_SITTING, false);
     }
 
     @Override

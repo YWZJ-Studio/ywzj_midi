@@ -2,6 +2,8 @@ package org.ywzj.midi.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,12 +11,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.client.render.item.InstrumentItemRenderer;
 import org.ywzj.midi.custom.instrument.BaseInstrumentData;
 import org.ywzj.midi.gui.ScreenManager;
 import org.ywzj.midi.instrument.Instrument;
+import org.ywzj.midi.util.ItemStackData;
 
 import java.util.function.Consumer;
 
@@ -28,15 +31,17 @@ public class InstrumentToolItem extends Item {
 
     public static ItemStack createInstance(BaseInstrumentData data) {
         ItemStack itemStack = new ItemStack(AllItems.INSTRUMENT_TOOL_ITEM.get());
-        itemStack.getOrCreateTag().putString(InstrumentToolItem.TAG_INSTRUMENT_TOOL_ID, data.getTool());
-        itemStack.setHoverName(Component.translatable("item.ywzj_midi." + data.getTool()));
+        CompoundTag tag = ItemStackData.get(itemStack);
+        tag.putString(InstrumentToolItem.TAG_INSTRUMENT_TOOL_ID, data.getTool());
+        ItemStackData.set(itemStack, tag);
+        itemStack.set(DataComponents.CUSTOM_NAME, Component.translatable("item.ywzj_midi." + data.getTool()));
         return itemStack;
     }
 
     public static boolean matches(ItemStack itemStack, String toolId) {
         return toolId != null
                 && itemStack.is(AllItems.INSTRUMENT_TOOL_ITEM.get())
-                && toolId.equals(itemStack.getOrCreateTag().getString(TAG_INSTRUMENT_TOOL_ID));
+                && toolId.equals(ItemStackData.get(itemStack).getString(TAG_INSTRUMENT_TOOL_ID));
     }
 
     public static boolean matches(ItemStack itemStack, Instrument instrument) {
@@ -48,7 +53,7 @@ public class InstrumentToolItem extends Item {
         if (!level.isClientSide) return InteractionResultHolder.pass(player.getItemInHand(interactionHand));
 
         ItemStack stack = player.getItemInHand(interactionHand);
-        String myId = stack.getOrCreateTag().getString(TAG_INSTRUMENT_TOOL_ID);
+        String myId = ItemStackData.get(stack).getString(TAG_INSTRUMENT_TOOL_ID);
         Instrument instrument = null;
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack candidate = player.getItemInHand(hand);

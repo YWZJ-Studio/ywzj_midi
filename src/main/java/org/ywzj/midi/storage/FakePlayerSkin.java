@@ -5,9 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLPaths;
 import org.ywzj.midi.YwzjMidi;
 
 import javax.annotation.Nullable;
@@ -77,7 +77,7 @@ public class FakePlayerSkin {
             e.printStackTrace();
         }
         if (image == null) {
-            return new ResourceLocation(YwzjMidi.MOD_ID,"err");
+            return YwzjMidi.modLocation("err");
         }
         return registerImage(image, name);
     }

@@ -1,6 +1,5 @@
 package org.ywzj.midi.gui.widget;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -22,11 +21,6 @@ public class CommonButton extends Button {
     public void updatePos(int x, int y) {
         this.setX(x);
         this.setY(y);
-    }
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override

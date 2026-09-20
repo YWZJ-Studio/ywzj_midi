@@ -3,19 +3,18 @@ package org.ywzj.midi.custom;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.api.custom.IInstrumentDataManager;
 import org.ywzj.midi.api.custom.IInstrumentModelManager;
 import org.ywzj.midi.network.Channel;
 import org.ywzj.midi.network.SliceReassembler;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber
 public class CommonAssetsManager {
 
     public static CommonAssetsManager INSTANCE;
@@ -54,31 +53,27 @@ public class CommonAssetsManager {
         if (INSTANCE != null) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeMap(INSTANCE.instrumentModelManager.getCache(),
-                    FriendlyByteBuf::writeResourceLocation,
-                    FriendlyByteBuf::writeUtf);
+                    (b, id) -> b.writeResourceLocation(id),
+                    (b, value) -> b.writeUtf(value));
             buf.writeMap(INSTANCE.instrumentDataManager.getCache(),
-                    FriendlyByteBuf::writeResourceLocation,
-                    FriendlyByteBuf::writeUtf);
+                    (b, id) -> b.writeResourceLocation(id),
+                    (b, value) -> b.writeUtf(value));
 
-            // 切片发送
             var packets = SliceReassembler.sliceData(buf);
-
             for (var packet : packets) {
                 if (event.getPlayer() != null) {
-                    Channel.CHANNEL.send(PacketDistributor.PLAYER.with(event::getPlayer), packet);
+                    Channel.CHANNEL.sendToPlayer(event.getPlayer(), packet);
                 } else {
-                    Channel.CHANNEL.send(PacketDistributor.ALL.noArg(), packet);
+                    Channel.CHANNEL.sendToAllPlayers(packet);
                 }
             }
         }
     }
 
-    // 收到所有数据包后组装数据并重载
     public static void fromNetwork(FriendlyByteBuf buf) {
         try {
-            var instrumentModelMap = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readUtf);
-            var instrumentDataMap = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readUtf);
-
+            var instrumentModelMap = buf.readMap(b -> b.readResourceLocation(), b -> b.readUtf());
+            var instrumentDataMap = buf.readMap(b -> b.readResourceLocation(), b -> b.readUtf());
             InstrumentModelManager.fromNetwork(instrumentModelMap);
             InstrumentDataManager.fromNetwork(instrumentDataMap);
         } catch (Exception exception) {

@@ -17,10 +17,8 @@ public class SelectionList<T> extends ObjectSelectionList<SelectionList<T>.Selec
     private final OnDoubleClick onDoubleClick;
 
     public SelectionList(List<Selection<T>> values, Screen screen, int width, int height, int y0, int y1, OnDoubleClick onDoubleClick) {
-        super(Minecraft.getInstance(), width, height, y0, y1, 20);
+        super(Minecraft.getInstance(), width, y1 - y0, y0, 20);
         this.screen = screen;
-        this.setRenderBackground(false);
-        this.setRenderTopAndBottom(false);
         this.values = values;
         this.values.forEach(value -> {
             SelectionEntry selectionEntry = new SelectionEntry(value);
@@ -33,10 +31,7 @@ public class SelectionList<T> extends ObjectSelectionList<SelectionList<T>.Selec
     }
 
     public void update(List<Selection<T>> values, int width, int height, int y0, int y1) {
-        this.width = width;
-        this.height = height;
-        this.y0 = y0;
-        this.y1 = y1;
+        this.updateSizeAndPosition(width, y1 - y0, y0);
         if (values != null) {
             Selection<T> selectedValue = null;
             if (this.getSelected() != null) {

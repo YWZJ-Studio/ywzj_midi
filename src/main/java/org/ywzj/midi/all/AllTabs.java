@@ -5,9 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.client.resource.ClientAssetsManager;
 import org.ywzj.midi.instrument.Instrument;
@@ -25,7 +25,7 @@ public class AllTabs {
 
     public static final List<Supplier<? extends ItemLike>> MISC_ITEMS = new ArrayList<>();
 
-    public static final RegistryObject<CreativeModeTab> TAB_MISC = TABS.register("tab_misc", () ->
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_MISC = TABS.register("tab_misc", () ->
             CreativeModeTab
                     .builder()
                     .title(ComponentUtils.translatable("tab.ywzj_midi.misc"))

@@ -1,11 +1,10 @@
 package org.ywzj.midi.network.message;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.ywzj.midi.network.SliceReassembler;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public record ServerSlicedPacket(UUID id, int index, int total, byte[] data) {
 
@@ -27,12 +26,8 @@ public record ServerSlicedPacket(UUID id, int index, int total, byte[] data) {
         return new ServerSlicedPacket(id, index, total, data);
     }
 
-    public static void handle(ServerSlicedPacket pkt, Supplier<NetworkEvent.Context> ctxSupplier) {
-        NetworkEvent.Context ctx = ctxSupplier.get();
-        ctx.setPacketHandled(true);
-        ctx.enqueueWork(() -> {
-            SliceReassembler.receiveSlice(pkt.id, pkt.index, pkt.total, pkt.data);
-        });
+    public static void handle(ServerSlicedPacket pkt, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> SliceReassembler.receiveSlice(pkt.id, pkt.index, pkt.total, pkt.data));
     }
 
 }

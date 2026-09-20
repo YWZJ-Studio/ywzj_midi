@@ -3,13 +3,12 @@ package org.ywzj.midi;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ywzj.midi.all.*;
@@ -27,12 +26,11 @@ public class YwzjMidi {
     public static final String CHANNEL = "ywzj_midi_channel";
     public static final Logger LOGGER = LogManager.getLogger(YwzjMidi.class);
 
-    public YwzjMidi()
+    public YwzjMidi(IEventBus eventBus)
     {
         Dist side = FMLLoader.getDist();
         InstrumentPackLoader.INSTANCE.packType = side.isClient() ? PackType.CLIENT_RESOURCES : PackType.SERVER_DATA;
         InstrumentPackLoader.INSTANCE.scanInstrumentPacks();
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         AllInstrumentDataTypes.init();
         AllHoldPose.preRegister();
@@ -44,7 +42,7 @@ public class YwzjMidi {
         register(eventBus, MOD_ID);
         eventBus.register(Channel.class);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        eventBus.addListener(this::onClientSetup);
     }
 
     public static void register(IEventBus eventBus, String namespace) {
@@ -61,17 +59,17 @@ public class YwzjMidi {
 
     @SuppressWarnings("removal")
     public static ResourceLocation modLocation(String name) {
-        return new ResourceLocation(MOD_ID, name);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
     }
 
     @SuppressWarnings("removal")
     public static ResourceLocation resourceLocation(String location) {
-        return new ResourceLocation(location);
+        return ResourceLocation.parse(location);
     }
 
     @SuppressWarnings("removal")
     public static ResourceLocation resourceLocation(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
 
 }

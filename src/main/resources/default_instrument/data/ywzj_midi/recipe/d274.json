@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    "GGG",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:spruce_log"
+    },
+    "G": {
+      "item": "minecraft:diamond_block"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "ywzj_midi:instrument_entity_item",
+    "components": {
+      "minecraft:custom_data": {
+        "instrument_id": "ywzj_midi:d274"
+      }
+    }
+  }
+}

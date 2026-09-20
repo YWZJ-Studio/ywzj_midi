@@ -1,6 +1,7 @@
 package org.ywzj.midi.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -22,14 +23,14 @@ public class NoteBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("note", note);
         return tag;
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag) {
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
         this.note = tag.getInt("note");
     }
 
@@ -39,14 +40,14 @@ public class NoteBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
         tag.putInt("note", note);
-        super.saveAdditional(tag);
+        super.saveAdditional(tag, registries);
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
         note = nbt.getInt("note");
     }
 

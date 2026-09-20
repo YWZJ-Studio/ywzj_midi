@@ -21,6 +21,7 @@ import org.ywzj.midi.client.resource.ClientAssetsManager;
 import org.ywzj.midi.item.InstrumentEntityItem;
 import org.ywzj.midi.item.InstrumentItem;
 import org.ywzj.midi.item.InstrumentToolItem;
+import org.ywzj.midi.util.ItemStackData;
 
 import javax.annotation.Nonnull;
 
@@ -36,7 +37,7 @@ public class InstrumentItemRenderer extends BlockEntityWithoutLevelRenderer {
     public void renderByItem(@Nonnull ItemStack itemStack, @Nonnull ItemDisplayContext transformType,
                              @Nonnull PoseStack poseStack, @Nonnull MultiBufferSource pBuffer,
                              int pPackedLight, int pPackedOverlay) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = ItemStackData.get(itemStack);
         String displayIdStr = null;
         if (itemStack.getItem() instanceof InstrumentItem ||  itemStack.getItem() instanceof InstrumentEntityItem) {
             displayIdStr = tag.getString(InstrumentItem.TAG_INSTRUMENT_ID);
@@ -67,7 +68,7 @@ public class InstrumentItemRenderer extends BlockEntityWithoutLevelRenderer {
                         poseStack.mulPose(Axis.YN.rotationDegrees(-45f));
                     }
                     VertexConsumer buffer = pBuffer.getBuffer(RenderType.entityTranslucent(slotTexture));
-                    SLOT_MODEL.renderToBuffer(poseStack, buffer, pPackedLight, pPackedOverlay, 1f, 1f, 1f, 1f);
+                    SLOT_MODEL.renderToBuffer(poseStack, buffer, pPackedLight, pPackedOverlay);
                 } else if (model != null && texture != null) {
                     VertexConsumer buffer = pBuffer.getBuffer(RenderType.entityCutout(texture));
                     model.renderToBuffer(poseStack, buffer, pPackedLight, pPackedOverlay, 1f, 1f, 1f, 1f);

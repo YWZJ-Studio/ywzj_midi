@@ -25,7 +25,7 @@ public class CPlayNote {
         this.x = -1;
         this.y = -1;
         this.z = -1;
-        this.instrumentId = new ResourceLocation("n", "n");
+        this.instrumentId = ResourceLocation.fromNamespaceAndPath("n", "n");
         this.variantId = -1;
         this.note = -1;
         this.velocity = -1;

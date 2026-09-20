@@ -1,6 +1,6 @@
 package org.ywzj.midi.storage;
 
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.nio.file.Path;

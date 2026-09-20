@@ -39,7 +39,7 @@ public class MidiScriptPoseProvider {
             ResourceLocation explicit = ResourceLocation.tryParse(scriptName);
             if (explicit != null) return explicit;
         }
-        return new ResourceLocation(instrumentId.getNamespace(), scriptName);
+        return ResourceLocation.fromNamespaceAndPath(instrumentId.getNamespace(), scriptName);
     }
 
     public static MidiScriptPoseProvider getInstance() {

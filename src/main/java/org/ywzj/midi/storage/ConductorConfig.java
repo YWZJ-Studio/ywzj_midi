@@ -3,7 +3,7 @@ package org.ywzj.midi.storage;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.FileReader;

@@ -1,84 +1,59 @@
 plugins {
     id 'eclipse'
     id 'idea'
-    id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev.legacyforge' version '2.0.91'
-}
-
-tasks.named('wrapper', Wrapper).configure {
-    distributionType = Wrapper.DistributionType.BIN
+    id 'net.neoforged.moddev' version '2.0.141'
 }
 
 version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = "${mod_id}-${minecraft_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-legacyForge {
-    version = project.minecraft_version + '-' + project.forge_version
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+neoForge {
+    version = neo_version
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
     }
 
     runs {
         client {
             client()
             gameDirectory = project.file('run/client_1')
-            // 使用 JetBrainsRuntime 时需要的参数，否则无法热重载
-            // 如果你使用别的 JDK，那么可以删除这一行
-            jvmArgument '-XX:+AllowEnhancedClassRedefinition'
-            jvmArgument '-Xmx4g'
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            jvmArgument('-XX:+AllowEnhancedClassRedefinition')
         }
 
         client2 {
             client()
             gameDirectory = project.file('run/client_2')
-            programArgument '--username'
-            programArgument 'Ranpoes'
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            programArguments.addAll('--username', 'Ranpoes')
         }
 
         server {
             server()
-            gameDirectory = project.file('run')
-            programArgument '--nogui'
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        gameTestServer {
-            type = 'gameTestServer'
-            gameDirectory = project.file('run')
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+            gameDirectory = project.file('run/server')
+            programArgument('--nogui')
         }
 
         data {
             data()
             gameDirectory = project.file('run-data')
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            logLevel = org.slf4j.event.Level.DEBUG
-        }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
+            programArguments.addAll('--mod', mod_id, '--all', '--output', file('src/generated/resources/').absolutePath,
+                    '--existing', file('src/main/resources/').absolutePath)
         }
     }
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenCentral()
@@ -86,55 +61,23 @@ repositories {
         dir 'libs'
     }
     maven {
-        url = 'https://repo.spongepowered.org/repository/maven-public/'
-    }
-    maven {
-        url 'https://cursemaven.com'
-        content {
-            includeGroup 'curse.maven'
-        }
-    }
-    maven {
-        url = 'https://api.modrinth.com/maven'
-    }
-    maven {
         url = 'https://jitpack.io'
         content {
             includeGroup 'com.github.mcmodderanchor'
         }
     }
-    maven {
-        name = "Jared's maven"
-        url = 'https://maven.blamejared.com/'
-    }
-}
-
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
-}
-obfuscation {
-    createRemappingConfiguration(configurations.localRuntime)
 }
 
 dependencies {
     // MP3格式音频支持
     jarJar(implementation('com.googlecode.soundlibs:mp3spi:1.9.5.4')) {
-        version {
-            strictly '[1.9.5.4,)'
-            prefer '1.9.5.4'
-        }
+        version { strictly '[1.9.5.4,)' }
     }
     jarJar(implementation('com.googlecode.soundlibs:jlayer:1.0.1.4')) {
-        version {
-            strictly '[1.0.1.4,)'
-            prefer '1.0.1.4'
-        }
+        version { strictly '[1.0.1.4,)' }
     }
     jarJar(implementation('com.googlecode.soundlibs:tritonus-share:0.3.7.4')) {
-        version {
-            strictly '[0.3.7.4,)'
-            prefer '0.3.7.4'
-        }
+        version { strictly '[0.3.7.4,)' }
     }
     // JS支持
     jarJar(implementation('ywzj:rhino:1.8.1-SNAPSHOT')) {
@@ -147,8 +90,8 @@ dependencies {
     // SBM
     jarJar(modImplementation('com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1')) {
         version {
-            strictly '[2.5.1-forge-mc1.20.1,)'
-            prefer '2.5.1-forge-mc1.20.1'
+            strictly '[2.5.1.1-neoforge-mc1.21.1,)'
+            prefer '2.5.1.1-neoforge-mc1.21.1'
         }
     }
     compileOnly('com.maydaymemory:mae:1.1.2') {
@@ -156,59 +99,39 @@ dependencies {
         exclude group: 'it.unimi.dsi', module: 'fastutil'
         exclude group: 'org.joml', module: 'joml'
     }
-    // JEI
-    modCompileOnly "mezz.jei:jei-1.20.1-common-api:${jei_version}"
-    modCompileOnly "mezz.jei:jei-1.20.1-forge-api:${jei_version}"
-    modLocalRuntime "mezz.jei:jei-1.20.1-forge:${jei_version}"
-    // 兼容性测试
-//    modImplementation 'local:sound-physics-remastered-forge:1.20.1-1.5.1'
-    if (!project.gradle.startParameter.taskNames.any { it.contains('runServer') }) {
-        modLocalRuntime 'maven.modrinth:embeddium:0.3.31+mc1.20.1'
-        modLocalRuntime 'curse.maven:rubidium-extra-654373:6101745'
-        modLocalRuntime 'curse.maven:oculus-581495:6020952'
-    }
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    implementation 'org.jetbrains:annotations:26.0.2'
 }
 
-mixin {
-    config 'mixins.ywzj_midi.json'
-    add sourceSets.main, 'ywzj_midi.refmap.json'
-}
-
-var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
-    var replaceProperties = [
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            forge_version          : forge_version,
-            forge_version_range    : forge_version_range,
+            neo_version            : neo_version,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
-            mod_description        : mod_description
+            mod_description        : mod_description,
     ]
     inputs.properties replaceProperties
-    expand replaceProperties
-    from 'src/main/templates'
-    into 'build/generated/sources/modMetadata'
+
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties + [project: project]
+    }
 }
-sourceSets.main.resources.srcDir generateModMetadata
-legacyForge.ideSyncTask generateModMetadata
 
 tasks.named('jar', Jar).configure {
+    includeEmptyDirs = false
     manifest {
         attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1',
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'MixinConfigs'            : 'mixins.ywzj_midi.json'
+                'Specification-Title'      : mod_id,
+                'Specification-Vendor'     : mod_authors,
+                'Specification-Version'    : '1',
+                'Implementation-Title'     : project.name,
+                'Implementation-Version'   : project.version,
+                'Implementation-Vendor'    : mod_authors,
+                'Implementation-Timestamp' : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -216,7 +139,7 @@ tasks.named('jar', Jar).configure {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            from components.java
+            artifact tasks.named('jarJar')
         }
     }
     repositories {
@@ -228,11 +151,4 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-idea {
-    module {
-        downloadSources = true
-        downloadJavadoc = true
-    }
 }

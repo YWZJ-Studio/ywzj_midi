@@ -3,8 +3,6 @@ package org.ywzj.midi.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -14,7 +12,6 @@ import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 import org.joml.Vector3d;
 import org.ywzj.midi.all.AllEntities;
 
@@ -54,7 +51,7 @@ public class SeatEntity extends Entity
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {}
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {}
@@ -63,18 +60,8 @@ public class SeatEntity extends Entity
     protected void addAdditionalSaveData(CompoundTag compound) {}
 
     @Override
-    public double getPassengersRidingOffset() {
-        return 0.0;
-    }
-
-    @Override
     protected boolean canRide(Entity entity) {
         return true;
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     public static InteractionResult create(Level level, BlockPos seatPos, Vector3d setPos, Player player, Direction direction) {

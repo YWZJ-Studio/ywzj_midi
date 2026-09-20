@@ -4,16 +4,17 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.resource.DelegatingPackResources;
-import net.minecraftforge.resource.PathPackResources;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -107,23 +108,32 @@ public enum InstrumentPackLoader implements RepositorySource {
 
     private List<Pack> instrumentPacksAsResource() {
         List<Pack> packs = new ArrayList<>();
-        List<PathPackResources> extensionPacks = new ArrayList<>();
+        List<PackResources> extensionPacks = new ArrayList<>();
         for (InstrumentPack instrumentPack : instrumentPacks) {
-            PathPackResources packResources = new InstrumentPackResources(instrumentPack);
-            extensionPacks.add(packResources);
-            Pack pack = Pack.readMetaAndCreate("ywzj_midi_resources_" + instrumentPack.meta().getNamespace(),
+            PackLocationInfo locationInfo = new PackLocationInfo(
+                    "ywzj_midi_resources_" + instrumentPack.meta().getNamespace(),
                     Component.translatable(instrumentPack.meta().getTitle()),
-                    true,
-                    (id) -> new DelegatingPackResources(id,
-                            false,
-                            new PackMetadataSection(Component.translatable(instrumentPack.meta().getDescription()), SharedConstants.getCurrentVersion().getPackVersion(packType)), extensionPacks) {
-                                public IoSupplier<InputStream> getRootResource(String... paths) {
-                                    if (paths.length == 1 && paths[0].equals("pack.png")) {
-                                        return packResources.getRootResource("pack.png");
-                                    }
-                                    return null;
-                                }
-                            }, packType, Pack.Position.BOTTOM, PackSource.BUILT_IN);
+                    PackSource.BUILT_IN,
+                    Optional.empty());
+            InstrumentPackResources packResources = new InstrumentPackResources(locationInfo, instrumentPack);
+            extensionPacks.add(packResources);
+            PackMetadataSection metadata = new PackMetadataSection(
+                    Component.translatable(instrumentPack.meta().getDescription()),
+                    SharedConstants.getCurrentVersion().getPackVersion(packType));
+            DelegatingPackResources resources = new DelegatingPackResources(locationInfo, metadata, extensionPacks) {
+                @Override
+                public IoSupplier<InputStream> getRootResource(String... paths) {
+                    if (paths.length == 1 && paths[0].equals("pack.png")) {
+                        return packResources.getRootResource("pack.png");
+                    }
+                    return null;
+                }
+            };
+            Pack pack = Pack.readMetaAndCreate(
+                    locationInfo,
+                    resources,
+                    packType,
+                    new PackSelectionConfig(true, Pack.Position.BOTTOM, false));
             packs.add(pack);
         }
         return packs;

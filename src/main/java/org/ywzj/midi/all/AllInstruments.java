@@ -1,11 +1,11 @@
 package org.ywzj.midi.all;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.ywzj.midi.custom.instrument.BaseInstrumentData;
 import org.ywzj.midi.instrument.Instrument;
 import org.ywzj.midi.item.InstrumentEntityItem;
@@ -54,7 +54,7 @@ public class AllInstruments {
         if (itemType.equals("entity")) {
             stacks.add(InstrumentEntityItem.createInstance(id, name));
         } else if (itemType.equals("block")) {
-            var item = ForgeRegistries.ITEMS.getValue(id);
+            var item = BuiltInRegistries.ITEM.get(id);
             if (item != null && item != Items.AIR) {
                 stacks.add(item.getDefaultInstance());
             }

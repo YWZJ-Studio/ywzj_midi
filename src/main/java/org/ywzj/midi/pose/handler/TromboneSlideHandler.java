@@ -2,10 +2,10 @@ package org.ywzj.midi.pose.handler;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import org.ywzj.midi.YwzjMidi;
 import org.ywzj.midi.all.AllItems;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class TromboneSlideHandler extends NotesHandler {
 
     private static final ConcurrentHashMap<UUID, ConcurrentLinkedQueue<Integer>> SLIDES = new ConcurrentHashMap<>();
@@ -48,7 +48,7 @@ public class TromboneSlideHandler extends NotesHandler {
     @SubscribeEvent
     public static void propertyOverrideRegistry(FMLClientSetupEvent event) {
         event.enqueueWork(() -> ItemProperties.register(AllItems.INSTRUMENT_ITEM.get(),
-                new ResourceLocation(YwzjMidi.MOD_ID, "note"),
+                YwzjMidi.modLocation("note"),
                 (itemStack, clientWorld, player, tag) -> {
                     if (player != null) {
                         SLIDES.computeIfAbsent(player.getUUID(), k -> new ConcurrentLinkedQueue<>());

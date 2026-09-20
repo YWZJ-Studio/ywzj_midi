@@ -2,7 +2,6 @@ package org.ywzj.midi.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -27,7 +26,7 @@ public class PianoBenchBlock extends HorizontalBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult ray) {
         Vector3d setPos = null;
         Direction direction = state.getValue(FACING);
         if (direction.equals(Direction.NORTH)) {

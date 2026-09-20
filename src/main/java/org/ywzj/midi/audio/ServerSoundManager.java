@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.PacketDistributor;
 import org.ywzj.midi.all.AllConfigs;
 import org.ywzj.midi.all.AllItems;
 import org.ywzj.midi.blockentity.SpeakerBlockEntity;
@@ -48,7 +47,7 @@ public class ServerSoundManager {
                 BlockEntity be = sender.level().getBlockEntity(new BlockPos((int)info.x, (int)info.y, (int)info.z));
                 if (!(be instanceof SpeakerBlockEntity speakerBlockEntity)) {
                     message.on = false;
-                    Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message.getServerMessage());
+                    Channel.CHANNEL.sendToPlayer(player, message.getServerMessage());
                     continue;
                 } else {
                     speakerBlockEntity.updateData(message.soundUuid, info.musicName, info.playerName);
@@ -59,7 +58,7 @@ public class ServerSoundManager {
                 if (playEntity.isRemoved()) {
                     message.on = false;
                     PLAY_ENTITIES.remove(info.deviceUuid);
-                    Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message.getServerMessage());
+                    Channel.CHANNEL.sendToPlayer(player, message.getServerMessage());
                     continue;
                 } else if (playEntity instanceof Player) {
                     boolean isDeviceInBag = ((Player)playEntity).getInventory().items.stream()
@@ -76,7 +75,7 @@ public class ServerSoundManager {
                     if (!isDeviceInBag) {
                         message.on = false;
                         PLAY_ENTITIES.remove(info.deviceUuid);
-                        Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message.getServerMessage());
+                        Channel.CHANNEL.sendToPlayer(player, message.getServerMessage());
                         continue;
                     }
                 }
@@ -89,15 +88,15 @@ public class ServerSoundManager {
             message.z = info.z;
             if (!message.on) {
                 PLAY_ENTITIES.remove(info.deviceUuid);
-                Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message.getServerMessage());
+                Channel.CHANNEL.sendToPlayer(player, message.getServerMessage());
                 continue;
             }
             if (player.equals(sender) && message instanceof CSyncMusic) {
                 SSyncMusic noBytesMessage = (SSyncMusic) message.getServerMessage();
                 noBytesMessage.bytes = new byte[0];
-                Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), noBytesMessage);
+                Channel.CHANNEL.sendToPlayer(player, noBytesMessage);
             } else {
-                Channel.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message.getServerMessage());
+                Channel.CHANNEL.sendToPlayer(player, message.getServerMessage());
             }
         }
     }

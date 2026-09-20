@@ -6,8 +6,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.ywzj.midi.gui.waterfall.WaterfallNote;
 import org.ywzj.midi.gui.waterfall.WaterfallPlayer;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class WaterfallScreen extends Screen {
 
     private static final ResourceLocation KEYBOARD_TEX =
-            new ResourceLocation("ywzj_midi", "textures/ui/keyboard.png");
+            ResourceLocation.fromNamespaceAndPath("ywzj_midi", "textures/ui/keyboard.png");
     private static final int TEX_W = 1822;
     private static final int TEX_H = 154;
 
@@ -65,7 +65,7 @@ public class WaterfallScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTick);
 
         int screenHeight = this.height;
         int screenWidth = this.width;

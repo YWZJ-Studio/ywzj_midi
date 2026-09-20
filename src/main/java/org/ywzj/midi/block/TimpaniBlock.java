@@ -37,7 +37,8 @@ public class TimpaniBlock extends HorizontalBlock implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult ray) {
+        InteractionHand hand = InteractionHand.MAIN_HAND;
         if (world.isClientSide) {
             TimpaniBlockEntity timpaniBlockEntity = (TimpaniBlockEntity) world.getBlockEntity(pos);
             if (timpaniBlockEntity == null) {

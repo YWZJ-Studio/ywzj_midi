@@ -1,8 +1,8 @@
 package org.ywzj.midi.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,6 +23,13 @@ import org.ywzj.midi.gui.ScreenManager;
 
 public class AABlock extends BaseEntityBlock {
 
+    public static final MapCodec<AABlock> CODEC = simpleCodec(AABlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -34,7 +41,7 @@ public class AABlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult ray) {
         if (world.isClientSide) {
             AABlockEntity aaBlockEntity = (AABlockEntity) world.getBlockEntity(pos);
             if (aaBlockEntity == null) {

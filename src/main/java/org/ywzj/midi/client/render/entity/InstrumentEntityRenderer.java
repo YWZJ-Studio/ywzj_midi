@@ -96,7 +96,7 @@ public class InstrumentEntityRenderer extends EntityRenderer<InstrumentEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull InstrumentEntity pEntity) {
-        return new ResourceLocation("missingno");
+        return ResourceLocation.withDefaultNamespace("missingno");
     }
 
     @Nullable
